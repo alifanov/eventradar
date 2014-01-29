@@ -1,5 +1,6 @@
 # coding: utf-8
 from django.db import models
+from django.contrib.auth.models import User
 
 # Create your models here.
 
@@ -19,16 +20,20 @@ class Feedback(models.Model):
         return u'[{}]: {}'.format(self.created, self.name)
 
 class Event(models.Model):
+    """
+    Модель события
+    """
+    users = models.ManyToManyField(User, verbose_name=u'Пользователи', related_name='events')
     post_date = models.DateTimeField(verbose_name=u'Время публикации записи')
-    evetn_date = models.DateField(verbose_name=u'Дата события')
+    event_date = models.DateField(verbose_name=u'Дата события')
     text = models.TextField(verbose_name=u'Описание события')
     source = models.CharField(max_length=100, verbose_name=u'Источник')
     is_public = models.BooleanField(default=False, verbose_name=u'Из паблика ВК')
-    link = models.CharField(max_length=256, verbose_name=u'Ссылка на оргинальный пост')
+    link = models.CharField(max_length=256, verbose_name=u'Ссылка на оргинальный пост', blank=True)
 
     class Meta:
         verbose_name = u'Событие'
         verbose_name_plural = u'События'
 
     def __unicode__(self):
-        return u'[{}]: {}'.format(self.date, self.source)
+        return u'[{}]: {}'.format(self.event_date, self.source)

@@ -41,6 +41,9 @@ class FeedbackView(TemplateView):
 
 class HomeView(TemplateView):
     template_name = 'home.html'
+    regexp = re.compile(u'.*(^|\s)([1-9]\d?\s(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))',
+        re.I)
+    pattern_day = re.compile(u'.*(сегодня|завтра)')
 
     def get_token(self):
         if UserSocialAuth.objects.filter(user=self.request.user, provider='vk-oauth').exists():
@@ -57,6 +60,7 @@ class HomeView(TemplateView):
 
     def get_groups(self):
         groups = self.call_api('groups.get',[('extended', '1')])
+        if len(groups) <= 1: return []
         return groups[1:]
 
     def get_date_from_string(self, date_str):
@@ -68,58 +72,60 @@ class HomeView(TemplateView):
         if u' ' in date_str:
             day,month = date_str.split(u' ')
             now = datetime.datetime.now()
-            date = datetime.date(day = day, month=months[month.lower()], year=now.year)
+            if day.isdigit():
+                day = int(day)
+                date = datetime.date(day = day, month=months[month.lower()], year=now.year)
         return date
 
+    def process_posts(self, posts, source):
+        if posts:
+            for post in posts[1:]:
+                if post['text'] and (self.regexp.match(post['text']) or self.pattern_day.match(post['text'])):
+                    date_str = None
+                    if self.regexp.match(post['text']):
+                        f = self.regexp.findall(post['text'])
+                        if f and len(f[0]) > 0:
+                            date_str = f[0][1]
+                    if self.pattern_day.match(post['text']):
+                        f = self.pattern_day.findall(post['text'])
+                        if f and len(f[0]) > 0:
+                            date_str = f[0]
+                    link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
+                    if not Event.objects.filter(link = link).exists():
+                        event_date = self.get_date_from_string(date_str).strftime(u'%Y-%m-%d')
+                        if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
+                            event = Event.objects.create(
+                                text = post['text'],
+                                source = source,
+                                link = link,
+                                post_date = datetime.datetime.fromtimestamp(int(post['date'])).strftime('%Y-%m-%d %H:%M:%S'),
+                                event_date = event_date
+                            )
+                            event.save()
+                    else:
+                        if not self.request.user.events.filter(link=link).exists():
+                            e = Event.objects.get(link=link)
+                            e.users.add(self.request.user)
+                            e.save()
+
     def get_posts(self):
-        posts = []
         if self.request.user.is_authenticated():
-            regexp = re.compile(u'.*(^|\s)(\d+\s(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))',
-            re.I)
-            pattern_day = re.compile(u'.*(сегодня|завтра)')
             for friend in self.get_friends():
                 try:
                     newposts = self.call_api('wall.get', [('owner_id', friend['uid']), ('count', 10)])
-                    for post in newposts[1:]:
-                        if post['text'] and (regexp.match(post['text']) or pattern_day.match(post['text'])):
-                            date_str = None
-                            if regexp.match(post['text']):
-                                f = regexp.findall(post['text'])
-                                if f and len(f[0]) > 0:
-                                    date_str = f[0][1]
-                            event = Event.objects.create(
-                                text = post['text'],
-                                source = u'{} {}'.format(friend['first_name'], friend['last_name']),
-                                link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id']),
-                                post_date = datetime.datetime.fromtimestamp(int(post['date'])).strftime('%d-%m-%Y %H:%M:%S'),
-                                event_date = self.get_date_from_string(date_str)
-                            )
-                            posts.append({
-                                u'source': event.source,
-                                u'text': event.text,
-                                u'date': event.post_date,
-                                u'link': event.link
-                            })
+                    self.process_posts(newposts, u'{} {}'.format(friend['first_name'], friend['last_name']))
                 except KeyError:
                     pass
 
             for group in self.get_groups():
                 try:
                     newposts = self.call_api('wall.get', [('owner_id', u'-{}'.format(group['gid'])), ('count', 10)])
-                    for post in newposts[1:]:
-                        if post['text'] and regexp.match(post['text']):
-                            posts.append({
-                                u'matched': True if regexp.match(post['text']) else False,
-                                u'source': group['name'],
-                                u'text': post['text'],
-                                u'date': datetime.datetime.fromtimestamp(int(post['date'])).strftime('%d-%m-%Y %H:%M:%S'),
-                                u'link': u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
-                            })
+                    self.process_posts(newposts, group['name'])
                 except KeyError:
                     pass
-        return posts
 
     def get_context_data(self, **kwargs):
         ctx = super(HomeView, self).get_context_data(**kwargs)
-        ctx['posts'] = self.get_posts()
+        self.get_posts()
+        ctx['posts'] = Event.objects.all()
         return ctx
