@@ -1,0 +1,42 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    {% if request.user.is_authenticated %}
+    <div class="container">
+        <h1>{{ request.user.username }}</h1>
+        {% for post in posts %}
+            <div class="panel {% if post.matched %}panel-primary{% else %}panel-default{% endif %}">
+                <div class="panel-heading">{{ post.date }} {{ post.source }}</div>
+                <div class="panel-body">
+                    {{ post.text|safe }}
+                </div>
+                <div class="panel-footer">
+                    <a target="_blank" href="{{ post.link }}">Подробее &rarr;</a>
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="container">
+            <div class="jumbotron">
+                <h1>Events Radar</h1>
+                <p>
+                    Система поиска событий в вашей новостной ленте ВКонтакте
+                </p>
+                <small style="font-size: 15px;">
+                <p>
+                    Иногда хочется куда-то сходить, но не знаешь куда.
+                    Можно поискать информацию на порталах типа Афиши, KudaGo и т.д., но иногда там только круные мероприятия.
+                    Можно обратиться к пабликам, но опять же там слишком много информации и постов не интересных Вам.
+                    Наконец можно обратиться к друзям и почитать их стены, но как отфильтровать всю не нужную информацию ?
+                </p>
+                <p>
+                    Events Radar как раз для этого и предназначен: поиск событий по друзям и группам, с фильтрацией по дате и сету проведения.
+                    Теперь Вам понадобится всего несколько минут, чтобы найти нтересное мероприятие на вечер.
+                </p>
+                </small>
+                <p><a href="{% url 'socialauth_begin' 'vk-oauth' %}" class="btn btn-primary btn-lg" role="button">Найти планы на вечер</a></p>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container" >
+    <div class="col-sm-6">
+        <h1>Обратная связь</h1>
+        <p>
+            Так как проект только развивается, то я очень бы хотел услышать впечатление от проекта: что плохо, что хорошо, что стоит улучшить и т.п.
+        </p>
+        <p>
+            Заранее спасибо.
+        </p>
+        {% if saved %}
+            <div class="alert alert-success">Отправлено</div>
+        {% endif %}
+        <form method="POST" role="form">{% csrf_token %}
+            <div class="form-group">
+                <label>Имя</label>
+                <input class="form-control" type="text" name="name" placeholder="Введите ваше имя" />
+            </div>
+            <div class="form-group">
+                <label>Текст</label>
+                <textarea class="form-control" name="text" rows="10"></textarea>
+            </div>
+            <button type="submit" class="btn btn-primary btn-block">Отправить</button>
+        </form>
+    </div>
+    </div>
+{% endblock %}
