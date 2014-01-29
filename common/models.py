@@ -17,3 +17,18 @@ class Feedback(models.Model):
 
     def __unicode__(self):
         return u'[{}]: {}'.format(self.created, self.name)
+
+class Event(models.Model):
+    post_date = models.DateTimeField(verbose_name=u'Время публикации записи')
+    evetn_date = models.DateField(verbose_name=u'Дата события')
+    text = models.TextField(verbose_name=u'Описание события')
+    source = models.CharField(max_length=100, verbose_name=u'Источник')
+    is_public = models.BooleanField(default=False, verbose_name=u'Из паблика ВК')
+    link = models.CharField(max_length=256, verbose_name=u'Ссылка на оргинальный пост')
+
+    class Meta:
+        verbose_name = u'Событие'
+        verbose_name_plural = u'События'
+
+    def __unicode__(self):
+        return u'[{}]: {}'.format(self.date, self.source)
