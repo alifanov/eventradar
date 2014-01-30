@@ -1,7 +1,7 @@
 # coding: utf-8
 # Create your views here.
 import re, datetime
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, ListView
 from social_auth.db.django_models import UserSocialAuth
 from common.utils import call_api
 from common.forms import FeedbackForm
@@ -21,6 +21,40 @@ months = {
     u'ноября': 11,
     u'декабря': 12
 }
+
+class TodayEventsView(ListView):
+    template_name = 'home.html'
+    context_object_name = 'posts'
+    active = 'today'
+
+    def get_queryset(self):
+        return Event.objects.filter(event_date=datetime.date.today())
+
+    def get_context_data(self, **kwargs):
+        ctx = super(TodayEventsView, self).get_context_data(**kwargs)
+        ctx['active_btn'] = self.active
+        return ctx
+
+class TomorrowEventsView(TodayEventsView):
+    active = 'tomorrow'
+
+    def get_queryset(self):
+        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+        return Event.objects.filter(event_date=tomorrow)
+
+class WeekEventsView(TodayEventsView):
+    active = 'week'
+
+    def get_queryset(self):
+        week = datetime.date.today() + datetime.timedelta(days=7)
+        return Event.objects.filter(event_date__lte=week)
+
+class MonthEventsView(TodayEventsView):
+    active = 'month'
+
+    def get_queryset(self):
+        month = datetime.date.today() + datetime.timedelta(days=30)
+        return Event.objects.filter(event_date__lte=month)
 
 class FeedbackView(TemplateView):
     template_name = 'feedback.html'
@@ -126,6 +160,6 @@ class HomeView(TemplateView):
 
     def get_context_data(self, **kwargs):
         ctx = super(HomeView, self).get_context_data(**kwargs)
-        self.get_posts()
+#        self.get_posts()
         ctx['posts'] = Event.objects.all()
         return ctx

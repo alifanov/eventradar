@@ -3,7 +3,19 @@
 {% block content %}
     {% if request.user.is_authenticated %}
     <div class="container">
-        <h1>{{ request.user.username }}</h1>
+                <h3 class="pull-left" style="margin-top: 15px;">Все новости</h3>
+                <div class="btn-group pull-right">
+                    <a href="{% url 'today-events' %}"
+                       class="btn {% if active_btn == 'today' %}btn-primary{% else %}btn-default{% endif %}">Сегодня</a>
+                    <a href="{% url 'tomorrow-events' %}"
+                       class="btn {% if active_btn == 'tomorrow' %}btn-primary{% else %}btn-default{% endif %}">Завтра</a>
+                    <a href="{% url 'week-events' %}"
+                       class="btn {% if active_btn == 'week' %}btn-primary{% else %}btn-default{% endif %}">На неделе</a>
+                    <a href="{% url 'month-events' %}"
+                       class="btn {% if active_btn == 'month' %}btn-primary{% else %}btn-default{% endif %}">За 30 дней</a>
+                </div>
+        <div class="clearfix"></div>
+        <hr />
         {% for post in posts %}
             <div class="panel panel-primary">
                 <div class="panel-heading">{{ post.date }} {{ post.source }}</div>

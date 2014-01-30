@@ -4,7 +4,8 @@ from django.conf.urls import patterns, include, url
 from django.contrib import admin
 admin.autodiscover()
 
-from common.views import HomeView, TemplateView, FeedbackView
+from common.views import HomeView, TemplateView, FeedbackView, TodayEventsView, TomorrowEventsView,\
+    WeekEventsView, MonthEventsView
 
 urlpatterns = patterns('',
     url(r'', include('social_auth.urls')),
@@ -13,6 +14,10 @@ urlpatterns = patterns('',
     url(r'^about/$', TemplateView.as_view(template_name='about.html'), name='about'),
     url(r'^contacts/$', TemplateView.as_view(template_name='contacts.html'), name='contacts'),
     url(r'^feedback/$', FeedbackView.as_view(), name='feedback'),
+    url(r'^today/$', TodayEventsView.as_view(), name='today-events'),
+    url(r'^tomorrow/$', TomorrowEventsView.as_view(), name='tomorrow-events'),
+    url(r'^week/$', WeekEventsView.as_view(), name='week-events'),
+    url(r'^month/$', MonthEventsView.as_view(), name='month-events'),
     # url(r'^eventradar/', include('eventradar.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
