@@ -51,7 +51,7 @@ USE_I18N = True
 USE_L10N = True
 
 # If you set this to False, Django will not use timezone-aware datetimes.
-USE_TZ = True
+USE_TZ = False
 
 # Absolute filesystem path to the directory that will hold user-uploaded files.
 # Example: "/var/www/example.com/media/"
@@ -214,3 +214,8 @@ SOCIAL_AUTH_PIPELINE = (
     # Обновляет инстанс user дополнительными данными с бекенда
     'social_auth.backends.pipeline.user.update_user_details'
     )
+
+try:
+    from local_settings import *
+except ImportError:
+    pass

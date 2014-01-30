@@ -26,6 +26,22 @@
                     <a target="_blank" href="{{ post.link }}">Подробее &rarr;</a>
                 </div>
             </div>
+        {% empty %}
+            <p>Идет обработка...</p>
+            <p>Это может занять несколько минут. А пока вы можете сделать себе кофе или чай :)</p>
+            <script type="text/javascript">
+                $(function()
+                {
+                    $.ajax({
+                        type: 'GET',
+                        url: '/process/',
+                        success: function(resp)
+                        {
+                            if (resp == 'Done') location.href = '/';
+                        }
+                    })
+                })
+            </script>
         {% endfor %}
     </div>
     {% else %}

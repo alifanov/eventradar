@@ -1,8 +1,9 @@
 # coding: utf-8
 # Create your views here.
 import re, datetime
-from django.views.generic import TemplateView, ListView
+from django.views.generic import TemplateView, ListView, View
 from social_auth.db.django_models import UserSocialAuth
+from django.http import HttpResponse
 from common.utils import call_api
 from common.forms import FeedbackForm
 from common.models import Event
@@ -22,59 +23,10 @@ months = {
     u'декабря': 12
 }
 
-class TodayEventsView(ListView):
-    template_name = 'home.html'
-    context_object_name = 'posts'
-    active = 'today'
-
-    def get_queryset(self):
-        return Event.objects.filter(event_date=datetime.date.today())
-
-    def get_context_data(self, **kwargs):
-        ctx = super(TodayEventsView, self).get_context_data(**kwargs)
-        ctx['active_btn'] = self.active
-        return ctx
-
-class TomorrowEventsView(TodayEventsView):
-    active = 'tomorrow'
-
-    def get_queryset(self):
-        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-        return Event.objects.filter(event_date=tomorrow)
-
-class WeekEventsView(TodayEventsView):
-    active = 'week'
-
-    def get_queryset(self):
-        week = datetime.date.today() + datetime.timedelta(days=7)
-        return Event.objects.filter(event_date__lte=week)
-
-class MonthEventsView(TodayEventsView):
-    active = 'month'
-
-    def get_queryset(self):
-        month = datetime.date.today() + datetime.timedelta(days=30)
-        return Event.objects.filter(event_date__lte=month)
-
-class FeedbackView(TemplateView):
-    template_name = 'feedback.html'
-    saved = False
-
-    def post(self, request, *args, **kwargs):
-        form = FeedbackForm(request.POST)
-        if form.is_valid():
-            form.save()
-            self.saved = True
-        return self.get(request, *args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        ctx = super(FeedbackView, self).get_context_data(**kwargs)
-        ctx['form'] = FeedbackForm()
-        ctx['saved'] = self.saved
-        return ctx
-
-class HomeView(TemplateView):
-    template_name = 'home.html'
+class ProcessView(View):
+    """
+    Производит сканирование по друзям и группам пользователя и выдает результат, когда все готово
+    """
     regexp = re.compile(u'.*(^|\s)([1-9]\d?\s(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))',
         re.I)
     pattern_day = re.compile(u'.*(сегодня|завтра)')
@@ -158,8 +110,62 @@ class HomeView(TemplateView):
                 except KeyError:
                     pass
 
+    def get(self, request, *args, **kwargs):
+        self.get_posts()
+        return HttpResponse('Done')
+
+class TodayEventsView(ListView):
+    template_name = 'home.html'
+    context_object_name = 'posts'
+    active = 'today'
+
+    def get_queryset(self):
+        return Event.objects.filter(event_date=datetime.date.today())
+
     def get_context_data(self, **kwargs):
-        ctx = super(HomeView, self).get_context_data(**kwargs)
-#        self.get_posts()
-        ctx['posts'] = Event.objects.all()
+        ctx = super(TodayEventsView, self).get_context_data(**kwargs)
+        ctx['active_btn'] = self.active
         return ctx
+
+class TomorrowEventsView(TodayEventsView):
+    active = 'tomorrow'
+
+    def get_queryset(self):
+        tomorrow = datetime.date.today() + datetime.timedelta(days=1)
+        return Event.objects.filter(event_date=tomorrow)
+
+class WeekEventsView(TodayEventsView):
+    active = 'week'
+
+    def get_queryset(self):
+        week = datetime.date.today() + datetime.timedelta(days=7)
+        return Event.objects.filter(event_date__lte=week)
+
+class MonthEventsView(TodayEventsView):
+    active = 'month'
+
+    def get_queryset(self):
+        month = datetime.date.today() + datetime.timedelta(days=30)
+        return Event.objects.filter(event_date__lte=month)
+
+class FeedbackView(TemplateView):
+    template_name = 'feedback.html'
+    saved = False
+
+    def post(self, request, *args, **kwargs):
+        form = FeedbackForm(request.POST)
+        if form.is_valid():
+            form.save()
+            self.saved = True
+        return self.get(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        ctx = super(FeedbackView, self).get_context_data(**kwargs)
+        ctx['form'] = FeedbackForm()
+        ctx['saved'] = self.saved
+        return ctx
+
+class HomeView(ListView):
+    template_name = 'home.html'
+    model = Event
+    context_object_name = 'posts'
