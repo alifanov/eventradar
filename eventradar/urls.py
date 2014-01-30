@@ -19,6 +19,7 @@ urlpatterns = patterns('',
     url(r'^week/$', WeekEventsView.as_view(), name='week-events'),
     url(r'^month/$', MonthEventsView.as_view(), name='month-events'),
     url(r'^process/$', ProcessView.as_view(), name='process'),
+    url(r'^auth-error/$', TemplateView.as_view(template_name='auth-error.html'), name='auth-error'),
     # url(r'^eventradar/', include('eventradar.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
