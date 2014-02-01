@@ -170,4 +170,6 @@ class HomeView(ListView):
     context_object_name = 'posts'
 
     def get_queryset(self):
-        return self.request.user.events.all()
+        if self.request.user.is_authenticated():
+            return self.request.user.events.all()
+        return Event.objects.none()
