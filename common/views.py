@@ -87,6 +87,7 @@ class ProcessView(View):
                                 post_date = datetime.datetime.fromtimestamp(int(post['date'])).strftime('%Y-%m-%d %H:%M:%S'),
                                 event_date = event_date
                             )
+                            event.users.add(self.request.user)
                             event.save()
                     else:
                         if not self.request.user.events.filter(link=link).exists():
