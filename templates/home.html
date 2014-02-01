@@ -20,7 +20,7 @@
             <div class="panel panel-primary">
                 <div class="panel-heading">{{ post.date }} {{ post.source }}</div>
                 <div class="panel-body">
-                    {{ post.text|safe }}
+                    {{ post.text|safe|truncatechars:"300" }}
                 </div>
                 <div class="panel-footer">
                     <a target="_blank" href="{{ post.link }}">Подробее &rarr;</a>
