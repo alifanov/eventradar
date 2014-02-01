@@ -1,8 +1,13 @@
 # coding: utf-8
 from django.db import models
 from django.contrib.auth.models import User
+import datetime
 
 # Create your models here.
+
+def del_old_evens():
+    today = datetime.date.today()
+    Event.objects.filter(event_date__lt=today).delete()
 
 class Feedback(models.Model):
     """
