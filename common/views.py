@@ -3,7 +3,7 @@
 import re, datetime
 from django.views.generic import TemplateView, ListView, View
 from social_auth.db.django_models import UserSocialAuth
-from django.http import HttpResponse
+from django.http import HttpResponse, HttpResponseRedirect
 from common.utils import call_api
 from common.forms import FeedbackForm
 from common.models import Event
@@ -97,22 +97,28 @@ class ProcessView(View):
 
     def get_posts(self):
         if self.request.user.is_authenticated():
-            for friend in self.get_friends():
+            friends = self.get_friends()
+            if friends is None: return None
+            for friend in friends:
                 try:
                     newposts = self.call_api('wall.get', [('owner_id', friend['uid']), ('count', 10)])
                     self.process_posts(newposts, u'{} {}'.format(friend['first_name'], friend['last_name']))
                 except KeyError:
                     pass
 
-            for group in self.get_groups():
+            groups = self.get_groups()
+            for group in groups:
                 try:
                     newposts = self.call_api('wall.get', [('owner_id', u'-{}'.format(group['gid'])), ('count', 10)])
                     self.process_posts(newposts, group['name'])
                 except KeyError:
                     pass
+            return len(friends)+len(groups)
+        return None
 
     def get(self, request, *args, **kwargs):
-        self.get_posts()
+        if self.get_posts() is None:
+            return HttpResponseRedirect('/auth-expired/')
         return HttpResponse('Done')
 
 class TodayEventsView(ListView):
