@@ -79,17 +79,17 @@ class ProcessView(View):
                     link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
                     if not Event.objects.filter(link = link).exists():
                         event_date = self.get_date_from_string(date_str).strftime(u'%Y-%m-%d')
+                        post_date = datetime.datetime.fromtimestamp(int(post['date'])).strftime('%Y-%m-%d %H:%M:%S')
                         if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
                             event = Event.objects.create(
                                 text = post['text'],
                                 source = source,
                                 link = link,
-                                post_date = datetime.datetime.fromtimestamp(int(post['date'])).strftime('%Y-%m-%d %H:%M:%S'),
+                                post_date = post_date,
                                 event_date = event_date
                             )
-                            if event.post_date.date() == event_date:
-                                event.users.add(self.request.user)
-                                event.save()
+                            event.users.add(self.request.user)
+                            event.save()
                     else:
                         if not self.request.user.events.filter(link=link).exists():
                             e = Event.objects.get(link=link)
