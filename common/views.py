@@ -127,7 +127,7 @@ class TodayEventsView(ListView):
     active = 'today'
 
     def get_queryset(self):
-        return self.request.user.filter(event_date=datetime.date.today())
+        return self.request.user.events.filter(event_date=datetime.date.today())
 
     def get_context_data(self, **kwargs):
         ctx = super(TodayEventsView, self).get_context_data(**kwargs)
@@ -139,21 +139,21 @@ class TomorrowEventsView(TodayEventsView):
 
     def get_queryset(self):
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-        return self.request.user.filter(event_date=tomorrow)
+        return self.request.user.events.filter(event_date=tomorrow)
 
 class WeekEventsView(TodayEventsView):
     active = 'week'
 
     def get_queryset(self):
         week = datetime.date.today() + datetime.timedelta(days=7)
-        return self.request.user.filter(event_date__lte=week)
+        return self.request.user.events.filter(event_date__lte=week)
 
 class MonthEventsView(TodayEventsView):
     active = 'month'
 
     def get_queryset(self):
         month = datetime.date.today() + datetime.timedelta(days=30)
-        return self.request.user.filter(event_date__lte=month)
+        return self.request.user.events.filter(event_date__lte=month)
 
 class FeedbackView(TemplateView):
     template_name = 'feedback.html'
