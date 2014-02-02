@@ -179,5 +179,5 @@ class HomeView(ListView):
 
     def get_queryset(self):
         if self.request.user.is_authenticated():
-            return self.request.user.events..order_by('event_date')
+            return self.request.user.events.order_by('event_date')
         return Event.objects.none()
