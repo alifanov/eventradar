@@ -1,7 +1,13 @@
 __author__ = 'vampire'
-import json
+import json, datetime
 import urllib2
 from urllib import urlencode
+from common.models import Event
+
+def del_old_evens():
+    today = datetime.date.today()
+    Event.objects.filter(event_date__lt=today).delete()
+
 
 def call_api(method, params, token):
     params.append(("access_token", token))
