@@ -218,6 +218,9 @@ SOCIAL_AUTH_PIPELINE = (
     'social_auth.backends.pipeline.user.update_user_details'
     )
 
+import djcelery
+djcelery.setup_loader()
+
 try:
     from local_settings import *
 except ImportError:
