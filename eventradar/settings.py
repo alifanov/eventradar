@@ -144,7 +144,8 @@ INSTALLED_APPS = (
     'south',
     'common',
     'social_auth',
-    'djcelery'
+    'djcelery',
+    'djkombu'
 )
 
 # A sample logging configuration. The only tangible logging
