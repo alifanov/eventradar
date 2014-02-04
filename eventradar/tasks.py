@@ -1,5 +1,4 @@
-from celery.task import periodic_task
-from celery.task import task
+from celery.task import task, periodic_task
 from celery.schedules import crontab
 from common.utils import del_old_evens
 
