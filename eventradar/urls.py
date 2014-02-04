@@ -5,7 +5,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 from common.views import HomeView, TemplateView, FeedbackView, TodayEventsView, TomorrowEventsView,\
-    WeekEventsView, MonthEventsView, ProcessView
+    WeekEventsView, MonthEventsView
 
 urlpatterns = patterns('',
     url(r'', include('social_auth.urls')),
@@ -18,7 +18,6 @@ urlpatterns = patterns('',
     url(r'^tomorrow/$', TomorrowEventsView.as_view(), name='tomorrow-events'),
     url(r'^week/$', WeekEventsView.as_view(), name='week-events'),
     url(r'^month/$', MonthEventsView.as_view(), name='month-events'),
-    url(r'^process/$', ProcessView.as_view(), name='process'),
     url(r'^auth-expired/$', TemplateView.as_view(), name='auth-expired'),
     url(r'^auth-error/$', TemplateView.as_view(template_name='auth-error.html'), name='auth-error'),
     # url(r'^eventradar/', include('eventradar.foo.urls')),
