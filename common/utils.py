@@ -81,6 +81,7 @@ class PostProcess(object):
                     link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
                     if not Event.objects.filter(link = link).exists():
                         event_date = self.get_date_from_string(date_str).strftime(u'%Y-%m-%d')
+                        print event_date
                         post_date = datetime.datetime.fromtimestamp(int(post['date'])).strftime('%Y-%m-%d %H:%M:%S')
                         if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
                             event = Event.objects.create(
