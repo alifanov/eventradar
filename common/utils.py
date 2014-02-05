@@ -86,7 +86,7 @@ class PostProcess(object):
                         post_date = datetime.datetime.fromtimestamp(int(post['date'])).strftime('%Y-%m-%d %H:%M:%S')
                         if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
                             event = Event.objects.create(
-                                text = post['text'],
+                                text = re.sub('[^0-9A-Za-zА-Яа-я_-]', "" ,post['text']),
                                 source = source,
                                 link = link,
                                 post_date = post_date,
