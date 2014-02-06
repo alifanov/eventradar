@@ -32,14 +32,18 @@
             <script type="text/javascript">
                 $(function()
                 {
-                    $.ajax({
-                        type: 'GET',
-                        url: '/process/',
-                        success: function(resp)
-                        {
-                            if (resp == 'Done') location.href = '/';
-                        }
-                    })
+                    var proc = function()
+                    {
+                        $.ajax({
+                            type: 'GET',
+                            url: '/run/',
+                            success: function(resp)
+                            {
+                                if (resp == 'SUCCESS') location.href = '/';
+                                else proc();
+                            }
+                        })
+                    };
                 })
             </script>
         {% endfor %}
