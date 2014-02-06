@@ -21,19 +21,18 @@
             $.ajax({
                 type: 'GET',
                 url: '/run/',
-                success: function(resp)
-                {
-                    console.log(resp);
-                    if (resp == 'SUCCESS'){
-                        location.href = '/';
-                    }
-                    else
+            }).done(function(resp)
                     {
+                        console.log(resp);
+                        if (resp == 'SUCCESS'){
+                            location.href = '/';
+                        }
+                        else
+                        {
 
-                        proc();
-                    }
-                }
-            })
+                            proc();
+                        }
+                    })
         };
     </script>
 </head>
