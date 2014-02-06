@@ -61,15 +61,18 @@
                 </li>
             </ul>
             <ul class="nav navbar-nav navbar-right">
-                <li>
                     {% if not request.user.is_authenticated %}
+                        <li>
                         <a href="{% url 'socialauth_begin' 'vk-oauth' %}">Авторизоваться в VK.com</a>
+                        </li>
                     {% else %}
+                        <li>
                         <a href="#" onclick="javascript:return false">{{ request.user.first_name }} {{ request.user.last_name }}</a>
-                        <a href="{% url 'logout' %}" class="glyphicon glyphicon-log-out">
-                        </a>
+                        </li>
+                        <li>
+                        <a href="{% url 'logout' %}" class="glyphicon glyphicon-log-out"></a>
+                        </li>
                     {% endif %}
-                </li>
             </ul>
         </div>
     </div>
