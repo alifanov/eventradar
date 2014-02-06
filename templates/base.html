@@ -20,9 +20,10 @@
         {
             $.ajax({
                 type: 'GET',
-                url: '/run/',
+                url: '/run/'
             }).done(function(resp)
                     {
+                        console.log('DONE');
                         console.log(resp);
                         if (resp == 'SUCCESS'){
                             location.href = '/';
