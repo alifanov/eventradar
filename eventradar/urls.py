@@ -21,7 +21,7 @@ urlpatterns = patterns('',
     url(r'^auth-expired/$', TemplateView.as_view(), name='auth-expired'),
     url(r'^auth-error/$', TemplateView.as_view(template_name='auth-error.html'), name='auth-error'),
     url(r'^logout/$', logout, name='logout'),
-    url(r'^run/$', process, name='process')
+    url(r'^run/$', process, name='process'),
     # url(r'^eventradar/', include('eventradar.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:
