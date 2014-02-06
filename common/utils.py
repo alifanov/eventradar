@@ -83,7 +83,7 @@ class PostProcess(object):
                     link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
                     if not Event.objects.filter(link = link).exists():
                         event_date = self.get_date_from_string(date_str).strftime(u'%Y-%m-%d')
-                        post_date = datetime.datetime.fromtimestamp(int(post['date'])).strftime('%Y-%m-%d %H:%M:%S')
+                        post_date = datetime.datetime.fromtimestamp(int(post['date']))#.strftime('%Y-%m-%d %H:%M:%S')
                         text = re.sub(u"[^а-яА-Я0-9.,\-\s]", "" ,post['text'])
                         if self.pattern_today.match(text) and not event_date == post_date.today(): continue
                         if self.pattern_tomorrow.match(text) and not event_date == post_date.today() + datetime.timedelta(days=1): continue
