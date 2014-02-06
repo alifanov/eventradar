@@ -4,6 +4,12 @@ import re, datetime
 from django.views.generic import TemplateView, ListView
 from common.forms import FeedbackForm
 from common.models import Event
+from django.contrib.auth import logout as auth_logout
+from django.http import HttpResponseRedirect
+
+def logout(request):
+    auth_logout(request)
+    return HttpResponseRedirect('/')
 
 class TodayEventsView(ListView):
     template_name = 'home.html'

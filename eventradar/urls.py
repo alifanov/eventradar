@@ -5,7 +5,7 @@ from django.contrib import admin
 admin.autodiscover()
 
 from common.views import HomeView, TemplateView, FeedbackView, TodayEventsView, TomorrowEventsView,\
-    WeekEventsView, MonthEventsView
+    WeekEventsView, MonthEventsView, logout
 
 urlpatterns = patterns('',
     url(r'', include('social_auth.urls')),
@@ -20,6 +20,7 @@ urlpatterns = patterns('',
     url(r'^month/$', MonthEventsView.as_view(), name='month-events'),
     url(r'^auth-expired/$', TemplateView.as_view(), name='auth-expired'),
     url(r'^auth-error/$', TemplateView.as_view(template_name='auth-error.html'), name='auth-error'),
+    url(r'^logout/$', logout, name='logout'),
     # url(r'^eventradar/', include('eventradar.foo.urls')),
 
     # Uncomment the admin/doc line below to enable admin documentation:

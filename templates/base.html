@@ -66,6 +66,9 @@
                         <a href="{% url 'socialauth_begin' 'vk-oauth' %}">Авторизоваться в VK.com</a>
                     {% else %}
                         <a href="#" onclick="javascript:return false">{{ request.user.first_name }} {{ request.user.last_name }}</a>
+                        <a href="{% url 'logout' %}">
+                        <span class="glyphicon glyphicon-log-out"></span>
+                        </a>
                     {% endif %}
                 </li>
             </ul>
