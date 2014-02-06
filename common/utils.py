@@ -29,6 +29,8 @@ class PostProcess(object):
     regexp = re.compile(u'.*(^|\s)([1-9]\d?\s(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))',
         re.I)
     pattern_day = re.compile(u'.*(сегодня|завтра)')
+    pattern_today = re.compile(u'.*(сегодня)')
+    pattern_tomorrow = re.compile(u'.*(завтра)')
 
     def __init__(self, user):
         self.user=user
@@ -83,6 +85,8 @@ class PostProcess(object):
                         event_date = self.get_date_from_string(date_str).strftime(u'%Y-%m-%d')
                         post_date = datetime.datetime.fromtimestamp(int(post['date'])).strftime('%Y-%m-%d %H:%M:%S')
                         text = re.sub('[^0-9A-Za-zА-Яа-я_-]', "" ,post['text'])
+                        if self.pattern_today.match(text) and not event_date == post_date.today(): continue
+                        if self.pattern_tomorrow.match(text) and not event_date == post_date.today() + datetime.timedelta(days=1): continue
                         if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
                             event = Event.objects.create(
                                 text = text,
