@@ -14,5 +14,10 @@ def get_posts():
         pp.get_posts()
 
 @task
+def get_new_posts(user):
+    pp = PostProcess(user)
+    pp.get_posts()
+
+@task
 def clean_events():
     del_old_evens()

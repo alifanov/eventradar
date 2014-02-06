@@ -5,11 +5,27 @@ from django.views.generic import TemplateView, ListView
 from common.forms import FeedbackForm
 from common.models import Event
 from django.contrib.auth import logout as auth_logout
-from django.http import HttpResponseRedirect
+from django.http import HttpResponseRedirect, HttpResponse
+from eventradar.tasks import get_new_posts
+from celery.result import AsyncResult
 
 def logout(request):
     auth_logout(request)
     return HttpResponseRedirect('/')
+
+def process(request):
+    data = 'Fail'
+    if 'task_id' in request.session:
+        r = AsyncResult(request.session['task_id'])
+        data = r.state
+    else:
+        if request.user.is_authenticated():
+            job = get_new_posts.delay(request.user)
+            request.session['task_id'] = job.id
+            data = job.id
+        else:
+            data = u'401 Authorization required'
+    return HttpResponse(data, mimetype='application/json')
 
 class TodayEventsView(ListView):
     template_name = 'home.html'
