@@ -18,22 +18,21 @@
     <script type="text/javascript">
         var proc = function()
         {
-            $.ajaxSetup({dataType: 'text'});
             $.ajax({
+                dataType: 'text',
                 type: 'GET',
-                url: '/run/'
-            }).done(function(resp)
+                url: '/run/',
+                success: function(resp)
+                {
+                    if (resp == 'SUCCESS'){
+                        location.reload();
+                    }
+                    else
                     {
-                        console.log('DONE');
-                        console.log(resp);
-                        if (resp == 'SUCCESS'){
-                            location.reload();
-                        }
-                        else
-                        {
-                            proc();
-                        }
-                    })
+                        proc();
+                    }
+                }
+            });
         };
     </script>
 </head>
