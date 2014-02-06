@@ -15,6 +15,27 @@
     <![endif]-->
     <!-- jQuery (necessary for Bootstrap's JavaScript plugins) -->
     <script src="https://code.jquery.com/jquery.js"></script>
+    <script type="text/javascript">
+        var proc = function()
+        {
+            $.ajax({
+                type: 'GET',
+                url: '/run/',
+                success: function(resp)
+                {
+                    console.log(resp);
+                    if (resp == 'SUCCESS'){
+                        location.href = '/';
+                    }
+                    else
+                    {
+
+                        proc();
+                    }
+                }
+            })
+        };
+    </script>
 </head>
 <body style="padding-bottom: 40px;">
 <!-- Yandex.Metrika counter -->
