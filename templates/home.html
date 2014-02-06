@@ -39,8 +39,14 @@
                             url: '/run/',
                             success: function(resp)
                             {
-                                if (resp == 'SUCCESS') location.href = '/';
-                                else proc();
+                                if (resp == 'SUCCESS'){
+                                    location.href = '/';
+                                }
+                                else
+                                {
+                                    console.log(resp);
+                                    proc();
+                                }
                             }
                         })
                     };
