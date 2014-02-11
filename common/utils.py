@@ -105,7 +105,7 @@ class PostProcess(object):
                             e.save()
 
     def get_posts(self):
-        monkey.patch_all()
+        monkey.patch_socket()
         friends = self.get_friends()
         if friends is None: return None
         for friend in friends:
