@@ -129,7 +129,7 @@ class PostProcess(object):
 
         for group in groups:
             threads.append(gevent.spawn(self.wall_get_spawn, group['name'], u'-{}'.format(group['gid'])))
-            self.wall_get_spawn()
+#            self.wall_get_spawn()
 
         for ap in self.added_posts:
             self.process_posts(ap['posts'], ap['source'])
