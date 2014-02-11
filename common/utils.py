@@ -107,7 +107,6 @@ class PostProcess(object):
 
     def wall_get_spawn(self, source, sid):
         posts = self.call_api('wall.get', [('owner_id', sid), ('count', 10)])
-        print source, len(posts) if posts else 0
         self.added_posts.append({
             'source': source,
             'posts': posts
@@ -136,7 +135,7 @@ class PostProcess(object):
 
         print len(self.added_posts)
         for ap in self.added_posts:
-            print ap['source'], len(ap['posts'])
+            print ap['source'], len(ap['posts']) if ap['posts'] else 0
             self.process_posts(ap['posts'], ap['source'])
 
         print u'Proccessed in {}'.format(time.time() - start)
