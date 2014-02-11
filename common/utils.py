@@ -107,6 +107,7 @@ class PostProcess(object):
 
     def wall_get_spawn(self, source, sid):
         posts = self.call_api('wall.get', [('owner_id', sid), ('count', 10)])
+        print len(posts)
         self.added_posts.append({
             'source': source,
             'posts': posts
