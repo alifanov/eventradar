@@ -131,6 +131,7 @@ class PostProcess(object):
             threads.append(gevent.spawn(self.wall_get_spawn, group['name'], u'-{}'.format(group['gid'])))
 #            self.wall_get_spawn()
 
+        print len(self.added_posts)
         for ap in self.added_posts:
             print ap['source'], len(ap['posts'])
             self.process_posts(ap['posts'], ap['source'])
