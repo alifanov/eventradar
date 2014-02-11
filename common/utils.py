@@ -118,21 +118,21 @@ class PostProcess(object):
         groups = self.get_groups()
         if friends is None: return None
 
-        monkey.patch_socket()
-        monkey.patch_ssl()
+#        monkey.patch_socket()
+#        monkey.patch_ssl()
 
         start = time.time()
 
         threads = []
         for friend in friends:
-            threads.append(gevent.spawn(self.wall_get_spawn, u'{} {}'.format(friend['first_name'], friend['last_name']), friend['uid']))
-#            self.wall_get_spawn()
+#            threads.append(gevent.spawn(self.wall_get_spawn, ))
+            self.wall_get_spawn(u'{} {}'.format(friend['first_name'], friend['last_name']), friend['uid'])
 
         for group in groups:
-            threads.append(gevent.spawn(self.wall_get_spawn, group['name'], u'-{}'.format(group['gid'])))
-#            self.wall_get_spawn()
+#            threads.append(gevent.spawn(self.wall_get_spawn, ))
+            self.wall_get_spawn(group['name'], u'-{}'.format(group['gid']))
 
-        gevent.joinall(threads)
+#        gevent.joinall(threads)
 
         print len(self.added_posts)
         for ap in self.added_posts:
