@@ -1,6 +1,6 @@
 # coding: utf-8
 __author__ = 'vampire'
-import json, datetime, re, time
+import json, datetime, re, time, gevent
 import urllib2
 from urllib import urlencode
 from common.models import Event
@@ -123,7 +123,8 @@ class PostProcess(object):
 
         threads = []
         for friend in friends:
-            self.wall_get_spawn(u'{} {}'.format(friend['first_name'], friend['last_name']), friend['uid'])
+            threads.append(gevent.spawn(self.wall_get_spawn, u'{} {}'.format(friend['first_name'], friend['last_name']), friend['uid']))
+#            self.wall_get_spawn()
 
         for group in groups:
             self.wall_get_spawn(group['name'], u'-{}'.format(group['gid']))
