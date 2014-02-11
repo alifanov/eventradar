@@ -5,6 +5,7 @@ import urllib2
 from urllib import urlencode
 from common.models import Event
 from social_auth.db.django_models import UserSocialAuth
+from gevent import monkey
 
 months = {
     u'января': 1,
@@ -50,7 +51,7 @@ class PostProcess(object):
 
     def get_groups(self):
         groups = self.call_api('groups.get',[('extended', '1')])
-        if len(groups) <= 1: return []
+        if not groups or len(groups) <= 1: return []
         return groups[1:]
 
     def get_date_from_string(self, date_str):
@@ -104,6 +105,7 @@ class PostProcess(object):
                             e.save()
 
     def get_posts(self):
+        monkey.patch_all()
         friends = self.get_friends()
         if friends is None: return None
         for friend in friends:
