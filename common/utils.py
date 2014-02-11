@@ -26,6 +26,7 @@ class PostProcess(object):
     """
     Производит сканирование по друзям и группам пользователя и выдает результат, когда все готово
     """
+    added_posts = []
     user = None
     regexp = re.compile(u'.*(^|\s)([1-9]\d?\s(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))',
         re.I)
@@ -104,24 +105,30 @@ class PostProcess(object):
                             e.users.add(self.user)
                             e.save()
 
-    def get_posts(self):
-        monkey.patch_socket()
-        friends = self.get_friends()
-        if friends is None: return None
-        for friend in friends:
-            try:
-                newposts = self.call_api('wall.get', [('owner_id', friend['uid']), ('count', 10)])
-                self.process_posts(newposts, u'{} {}'.format(friend['first_name'], friend['last_name']))
-            except KeyError:
-                pass
+    def wall_get_spawn(self, source, sid):
+        posts = self.call_api('wall.get', [('owner_id', sid), ('count', 10)])
+        self.added_posts.append({
+            'source': source,
+            'posts': posts
+        })
 
+    def get_posts(self):
+        friends = self.get_friends()
         groups = self.get_groups()
+        if friends is None: return None
+
+#        monkey.patch_socket()
+
+        threads = []
+        for friend in friends:
+            self.wall_get_spawn(u'{} {}'.format(friend['first_name'], friend['last_name']), friend['uid'])
+
         for group in groups:
-            try:
-                newposts = self.call_api('wall.get', [('owner_id', u'-{}'.format(group['gid'])), ('count', 10)])
-                self.process_posts(newposts, group['name'])
-            except KeyError:
-                pass
+            self.wall_get_spawn(group['name'], u'-{}'.format(group['gid']))
+
+        for ap in self.added_posts:
+            self.process_posts(ap['posts'], ap['source'])
+
         return len(friends)+len(groups)
 
 
@@ -133,9 +140,7 @@ def del_old_evens():
 def call_api(method, params, token):
     params.append(("access_token", token))
     url = "https://api.vk.com/method/%s?%s" % (method, urlencode(params))
-    try:
-        response = json.loads(urllib2.urlopen(url).read())
-        resp = response['response']
-    except KeyError:
-        return None
-    return resp
+    r = urllib2.urlopen(url)
+    response = json.loads(r.read())
+    if not 'response' in response: return None
+    return response['response']
