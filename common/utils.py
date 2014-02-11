@@ -1,6 +1,6 @@
 # coding: utf-8
 __author__ = 'vampire'
-import json, datetime, re
+import json, datetime, re, time
 import urllib2
 from urllib import urlencode
 from common.models import Event
@@ -119,6 +119,8 @@ class PostProcess(object):
 
 #        monkey.patch_socket()
 
+        start = time.time()
+
         threads = []
         for friend in friends:
             self.wall_get_spawn(u'{} {}'.format(friend['first_name'], friend['last_name']), friend['uid'])
@@ -128,6 +130,8 @@ class PostProcess(object):
 
         for ap in self.added_posts:
             self.process_posts(ap['posts'], ap['source'])
+
+        print u'Proccessed in {}'.format(time.time() - start)
 
         return len(friends)+len(groups)
 
