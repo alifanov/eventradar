@@ -118,6 +118,7 @@ class PostProcess(object):
         if friends is None: return None
 
         monkey.patch_socket()
+        monkey.patch_ssl()
 
         start = time.time()
 
