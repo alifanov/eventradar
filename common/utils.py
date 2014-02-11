@@ -135,7 +135,6 @@ class PostProcess(object):
 
         print len(self.added_posts)
         for ap in self.added_posts:
-            print ap['source'], len(ap['posts']) if ap['posts'] else 0
             self.process_posts(ap['posts'], ap['source'])
 
         print u'Proccessed in {}'.format(time.time() - start)
