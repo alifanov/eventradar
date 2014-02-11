@@ -1,6 +1,7 @@
 # coding: utf-8
 __author__ = 'vampire'
 import json, datetime, re, time, gevent
+import requests
 import urllib2
 from urllib import urlencode
 from common.models import Event
@@ -44,14 +45,14 @@ class PostProcess(object):
         return None
 
     def call_api(self, method, params):
-        return call_api(method, params, self.get_token())
+        return req_call_api(method, params, self.get_token())
 
     def get_friends(self):
-        friends = self.call_api('friends.get', [('fields', 'uid, first_name, last_name')])
+        friends = self.call_api('friends.get', {'fields': 'uid, first_name, last_name'})
         return friends
 
     def get_groups(self):
-        groups = self.call_api('groups.get',[('extended', '1')])
+        groups = self.call_api('groups.get',{'extended': '1'})
         if not groups or len(groups) <= 1: return []
         return groups[1:]
 
@@ -106,7 +107,7 @@ class PostProcess(object):
                             e.save()
 
     def wall_get_spawn(self, source, sid):
-        posts = self.call_api('wall.get', [('owner_id', sid), ('count', 10)])
+        posts = self.call_api('wall.get', {'owner_id': sid, 'count': 10})
         self.added_posts.append({
             'source': source,
             'posts': posts
@@ -146,6 +147,13 @@ def del_old_evens():
     today = datetime.date.today()
     Event.objects.filter(event_date__lt=today).delete()
 
+def req_call_api(method, params, token):
+    params['access_token'] = token
+    url = "https://api.vk.com/method/%s" % (method)
+    resp = requests.get(url, params=params)
+    if resp.status_code != 200: return None
+    resp = resp.json()
+    return resp['response']
 
 def call_api(method, params, token):
     params.append(("access_token", token))
