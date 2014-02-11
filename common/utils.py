@@ -132,6 +132,7 @@ class PostProcess(object):
 #            self.wall_get_spawn()
 
         for ap in self.added_posts:
+            print ap['source'], len(ap['posts'])
             self.process_posts(ap['posts'], ap['source'])
 
         print u'Proccessed in {}'.format(time.time() - start)
