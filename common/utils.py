@@ -117,7 +117,7 @@ class PostProcess(object):
         groups = self.get_groups()
         if friends is None: return None
 
-#        monkey.patch_socket()
+        monkey.patch_socket()
 
         start = time.time()
 
