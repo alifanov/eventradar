@@ -3,24 +3,9 @@ var url = require('url');
 var https = require('https');
 var async = require('async');
 var request = require('request');
-var mysql = require('mysql'),
-    mysqlUtilities = require('mysql-utilities');
+var redis = require('redis');
 
-var conn = mysql.createConnection({
-    host: 'localhost',
-    user: 'eventuser',
-    password: 'eventpass',
-    database: 'eventdb'
-});
-
-conn.connect();
-mysqlUtilities.upgrade(conn);
-mysqlUtilities.introspection(conn);
-
-conn.count('common_event', {}, function(err, count)
-{
-    console.log(count);
-});
+var client = redis.createClient();
 
 var time = process.hrtime();
 var nums = 0;
@@ -134,21 +119,8 @@ fs.readFile('urls.txt', function(err, logData)
                                         source: posts[ii].to_id,
                                         link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                     };
-                                    conn.count('common_event', doc, function(err, cnt){
-                                        if(cnt == 0){
-                                            conn.insert('common_event', doc, function(err, recordID){
-                                                if (err)
-                                                {
-                                                    console.log('Error: '+err);
-                                                }
-                                                else
-                                                {
-                                                    console.log('Add record ' + recordID);
-                                                }
-                                            });
-                                        }
-                                    });
-
+                                    var exists = client.get(doc.link);
+                                    console.log(exists);
 //                                    console.log('[ ' + d.toDateString() + ' ]: ' + posts[ii].text);
                                     good_post_count+=1;
                                 }
