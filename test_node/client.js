@@ -121,19 +121,8 @@ fs.readFile('urls.txt', function(err, logData)
                                         link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                     };
 
-                                    var exists = client.get(doc.link, function(err,res)
-                                    {
-                                        console.log(err);
-                                    });
-                                    console.log(exists);
-                                    if(!exists)
-                                    {
-                                        client.set(doc.link, doc, function(err, res)
-                                        {
-                                            console.log(err);
-                                            console.log(res);
-                                        });
-                                    }
+                                    client.set(doc.link, doc);
+
                                     good_post_count+=1;
                                 }
 
