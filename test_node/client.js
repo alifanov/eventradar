@@ -6,7 +6,7 @@ var request = require('request');
 var redis = require("redis"),
     client = redis.createClient();
 
-client.get('123', function(err,res)
+client.get('http*', function(err,res)
 {
     console.log(res);
 });
