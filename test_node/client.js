@@ -119,7 +119,10 @@ fs.readFile('urls.txt', function(err, logData)
                                         source: posts[ii].to_id,
                                         link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                     };
-                                    var exists = client.get(doc.link);
+                                    client.get(doc.link, function(err, res)
+                                    {
+                                        console.log(res);
+                                    });
                                     console.log(exists);
 //                                    console.log('[ ' + d.toDateString() + ' ]: ' + posts[ii].text);
                                     good_post_count+=1;
@@ -132,7 +135,6 @@ fs.readFile('urls.txt', function(err, logData)
             }
             var diff = process.hrtime(time);
             console.log('DONE %d in %d sec %d nsec [Good: %d]', urls.length, diff[0], diff[1], good_post_count);
-            conn.end();
         }
     });
 
