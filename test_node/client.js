@@ -120,11 +120,11 @@ fs.readFile('urls.txt', function(err, logData)
                                     };
 
                                     var exists = client.get(doc.link);
+                                    console.log(exists);
                                     if(!exists)
                                     {
                                         client.set(doc.link, doc);
                                     }
-//                                    console.log('[ ' + d.toDateString() + ' ]: ' + posts[ii].text);
                                     good_post_count+=1;
                                 }
 
