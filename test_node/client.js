@@ -6,6 +6,11 @@ var request = require('request');
 var redis = require("redis"),
     client = redis.createClient();
 
+client.keys('https://vk.com/wall*', function(err, res)
+{
+    console.log(res);
+});
+
 client.get('https://vk.com/wall17424_7030', function(err,res)
 {
     console.log(JSON.parse(res).text);
