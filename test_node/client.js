@@ -132,11 +132,8 @@ fs.readFile('urls.txt', function(err, logData)
                                         link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                     };
                                     conn.count('common_event', doc, function(err, cnt){
-                                        if (err)
-                                        {
-                                            console.log('Error: '+err);
-                                        }
                                         if(cnt == 0){
+                                            console.log(conn);
                                             conn.insert('common_event', doc, function(err, recordID){
                                                 if (err)
                                                 {
