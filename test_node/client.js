@@ -8,7 +8,7 @@ var redis = require("redis"),
 
 client.get('https://vk.com/wall17424_7030', function(err,res)
 {
-//    console.log(JSON.parse(res).link);
+    console.log(JSON.parse(res).link);
 });
 
 var time = process.hrtime();
