@@ -122,7 +122,7 @@ fs.readFile('urls.txt', function(err, logData)
                                     var exists = client.get(doc.link);
                                     if(!exists)
                                     {
-                                        client.set(doc.link, '123');
+                                        client.set(doc.link, '123', hiredis.print);
                                     }
 //                                    console.log('[ ' + d.toDateString() + ' ]: ' + posts[ii].text);
                                     good_post_count+=1;
