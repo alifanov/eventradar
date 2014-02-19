@@ -6,7 +6,10 @@ var request = require('request');
 var redis = require("redis"),
     client = redis.createClient();
 
-console.log(client.get('*'));
+client.get('*', function(err,res)
+{
+    console.log(res);
+});
 
 var time = process.hrtime();
 var nums = 0;
