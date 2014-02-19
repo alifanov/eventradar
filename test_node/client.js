@@ -46,7 +46,7 @@ fs.readFile('urls.txt', function(err, logData)
     console.log('Count: '+urls.length);
     urls = objectDeDup(urls);
     console.log('Count of uniq: '+urls.length);
-    urls = urls.slice(0, 20000);
+    urls = urls.slice(0, 200);
     nums = urls.length;
 
     console.log('Count fo urls: ' + urls.length);
