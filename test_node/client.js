@@ -3,6 +3,24 @@ var url = require('url');
 var https = require('https');
 var async = require('async');
 var request = require('request');
+var mysql = require('mysql'),
+    mysqlUtilities = require('utilities');
+
+var conn = mysql.createConnection({
+    host: 'localhost',
+    user: 'eventuser',
+    password: 'eventpass',
+    database: 'eventdb'
+});
+
+conn.connect();
+mysqlUtilities.upgrade(connection);
+mysqlUtilities.introspection(connection);
+
+conn.queryRow('select * from common_event', [], function(err, row)
+{
+    console.log(row);
+});
 
 var time = process.hrtime();
 var nums = 0;
@@ -35,6 +53,8 @@ var objectDeDup = function(unordered) {
     result = Object.keys(object);
     return result;
 };
+
+
 fs.readFile('urls.txt', function(err, logData)
 {
     if (err) throw err;
@@ -84,7 +104,7 @@ fs.readFile('urls.txt', function(err, logData)
                                 var d = new Date(posts[ii].date*1000);
                                 if (d.toDateString() == today.toDateString())
                                 {
-                                    console.log('[ today ' + d.toDateString() + ']: ' + posts[ii].text);
+//                                    console.log('[ today ' + d.toDateString() + ']: ' + posts[ii].text);
                                     good_post_count+=1;
                                 }
                             }
@@ -93,7 +113,7 @@ fs.readFile('urls.txt', function(err, logData)
                                 var d = new Date(posts[ii].date*1000);
                                 if (tomorrow.toDateString() == d.toDateString())
                                 {
-                                    console.log('[ tomorrow ' + d.toDateString() + ']: ' + posts[ii].text);
+//                                    console.log('[ tomorrow ' + d.toDateString() + ']: ' + posts[ii].text);
                                     good_post_count+=1;
                                 }
                             }
@@ -103,7 +123,7 @@ fs.readFile('urls.txt', function(err, logData)
                                 var d = new Date(today.getFullYear(), months[dat[1]], dat[0]);
                                 if(d >= today.setHours(0, 0, 0, 0))
                                 {
-                                    console.log('[ ' + d.toDateString() + ' ]: ' + posts[ii].text);
+//                                    console.log('[ ' + d.toDateString() + ' ]: ' + posts[ii].text);
                                     good_post_count+=1;
                                 }
 
