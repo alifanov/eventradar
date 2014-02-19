@@ -6,19 +6,22 @@ var request = require('request');
 var redis = require("redis"),
     client = redis.createClient();
 
-client.keys('https://vk.com/wall*', function(err, res)
-{
-    for(i in res)
-    {
-        client.get(res[i], function(err, r)
-        {
-            console.log(r);
-        });
-    }
-});
+
+var vkid = '194484';
+var uids = [];
 
 var time = process.hrtime();
 var nums = 0;
+
+var fetch = function(file,cb){
+    request.get(file, function(err,response,body){
+        if ( err){
+            cb(err);
+        } else {
+            cb(null, body); // First param indicates error, null=> no error
+        }
+    });
+};
 
 var date_exp = /(^|\s)([1-9]\d?\s(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))/mgi;
 
@@ -52,6 +55,22 @@ var objectDeDup = function(unordered) {
 
 fs.readFile('urls.txt', function(err, logData)
 {
+    request.get('https://api.vk.com/method/friends.get?uid='+vkid, function(err, response, body){
+        var b = JSON.parse(body);
+        uids = body.response;
+        var uids_urls = _.map(uids, function(uid){
+            return 'https://api.vk.com/method/friends.get?uid='+uid;
+        });
+        async.map(uids_urls, fetch, function(err, res)
+        {
+            for(i in res)
+            {
+                uids = uids.concat(res[i]);
+            }
+            console.log(uids.length)
+        });
+    });
+/*
     if (err) throw err;
 
     var text = logData.toString();
@@ -66,15 +85,6 @@ fs.readFile('urls.txt', function(err, logData)
 
     console.log('Count fo urls: ' + urls.length);
 
-    var fetch = function(file,cb){
-        request.get(file, function(err,response,body){
-            if ( err){
-                cb(err);
-            } else {
-                cb(null, body); // First param indicates error, null=> no error
-            }
-        });
-    };
 
     async.map(urls, fetch, function(err, results){
         if ( err){
@@ -145,5 +155,6 @@ fs.readFile('urls.txt', function(err, logData)
             console.log('DONE %d in %d sec %d nsec [Good: %d]', urls.length, diff[0], diff[1], good_post_count);
         }
     });
-
+*/
+    client.quit();
 });
