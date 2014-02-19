@@ -120,7 +120,6 @@ fs.readFile('urls.txt', function(err, logData)
                                     };
 
                                     var exists = client.get(doc.link);
-                                    console.log(client);
                                     if(!exists)
                                     {
                                         client.set(doc.link, doc);
