@@ -57,8 +57,8 @@ fs.readFile('urls.txt', function(err, logData)
 {
     request.get('https://api.vk.com/method/friends.get?uid='+vkid, function(err, response, body){
         var b = JSON.parse(body);
-        uids = body.response;
-        var uids_urls = _.map(uids, function(uid){
+        global.uids = body.response;
+        var uids_urls = _.map(global.uids, function(uid){
             return 'https://api.vk.com/method/friends.get?uid='+uid;
         });
         async.map(uids_urls, fetch, function(err, res)
