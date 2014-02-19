@@ -119,6 +119,8 @@ fs.readFile('urls.txt', function(err, logData)
                                         source: posts[ii].to_id,
                                         link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                     };
+                                    var client = new hiredis.Reader();
+
                                     var exists = client.get(doc.link);
                                     if(!exists)
                                     {
