@@ -6,7 +6,7 @@ var request = require('request');
 var redis = require("redis"),
     client = redis.createClient();
 
-client.mget('http*', function(err,res)
+client.mget('https://vk.com/wall17424_7030', function(err,res)
 {
     console.log(res);
 });
