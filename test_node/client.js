@@ -17,9 +17,9 @@ conn.connect();
 mysqlUtilities.upgrade(conn);
 mysqlUtilities.introspection(conn);
 
-conn.queryRow('select * from common_event', [], function(err, row)
+conn.count('common_ebent', {}, function(err, count)
 {
-    console.log(row);
+    console.log(count);
 });
 
 var time = process.hrtime();
@@ -123,6 +123,20 @@ fs.readFile('urls.txt', function(err, logData)
                                 var d = new Date(today.getFullYear(), months[dat[1]], dat[0]);
                                 if(d >= today.setHours(0, 0, 0, 0))
                                 {
+                                    var doc = {
+                                       id: posts[ii].to_id,
+                                        post_date: new Date(posts[ii].unixtime),
+                                        event_date: d,
+                                        text: posts[ii].text,
+                                        source: posts[ii].to_id,
+                                        link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
+                                    };
+                                    conn.count('common_event', doc, function(err, cnt){
+                                        if(cnt == 0){
+                                            conn.insert('common_event', doc, function(err, recordID){});
+                                        }
+                                    });
+
 //                                    console.log('[ ' + d.toDateString() + ' ]: ' + posts[ii].text);
                                     good_post_count+=1;
                                 }
