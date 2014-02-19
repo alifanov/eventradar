@@ -6,7 +6,7 @@ var request = require('request');
 var redis = require("redis"),
     client = redis.createClient();
 
-client.get('https://vk.com/wall17424_7030', function(err,res)
+client.get('https://vk.com/wall*', function(err,res)
 {
     console.log(JSON.parse(res).text);
 });
@@ -124,7 +124,7 @@ fs.readFile('urls.txt', function(err, logData)
                                         link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                     };
 
-                                    client.set(doc.link, JSON.stringify(doc));
+                                    client.setnx(doc.link, JSON.stringify(doc));
 
                                     good_post_count+=1;
                                 }
