@@ -3,9 +3,9 @@ var url = require('url');
 var https = require('https');
 var async = require('async');
 var request = require('request');
-var redis = require('redis');
+var hiredis = require('hiredis');
 
-var client = redis.createClient();
+var client = new hiredis.Reader();
 
 var time = process.hrtime();
 var nums = 0;
@@ -119,10 +119,7 @@ fs.readFile('urls.txt', function(err, logData)
                                         source: posts[ii].to_id,
                                         link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                     };
-                                    client.get(doc.link, function(err, res)
-                                    {
-                                        console.log(res);
-                                    });
+                                    var exists = client.get(doc.link);
                                     console.log(exists);
 //                                    console.log('[ ' + d.toDateString() + ' ]: ' + posts[ii].text);
                                     good_post_count+=1;
