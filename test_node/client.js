@@ -56,10 +56,9 @@ fs.readFile('urls.txt', function(err, logData)
 {
     request.get('https://api.vk.com/method/friends.get?uid='+vkid, function(err, response, body){
         var b = JSON.parse(body);
-        uids = body.response;
+        uids = b.response;
         var uids_urls = _.map(uids, function(uid){
             client.setnx('uid_'+uid);
-            console.log('Set uid: '+uid);
             return 'https://api.vk.com/method/friends.get?uid='+uid;
         });
         async.map(uids_urls, fetch, function(err, res)
@@ -71,6 +70,7 @@ fs.readFile('urls.txt', function(err, logData)
                 {
                     _.map(raw_resp.response, function(uid)
                     {
+                        console.log('Set uid: '+uid);
                         client.setnx('uid_'+uid);
                     });
                 }
