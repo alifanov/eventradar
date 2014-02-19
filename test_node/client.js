@@ -128,7 +128,10 @@ fs.readFile('urls.txt', function(err, logData)
                                     console.log(exists);
                                     if(!exists)
                                     {
-                                        client.set(doc.link, doc);
+                                        client.set(doc.link, doc, function(err, res)
+                                        {
+                                            console.log(err);
+                                        });
                                     }
                                     good_post_count+=1;
                                 }
