@@ -8,10 +8,13 @@ var redis = require("redis"),
 
 client.keys('https://vk.com/wall*', function(err, res)
 {
-    client.get(res, function(err, r)
+    for(i in res)
     {
-        console.log(r);
-    });
+        client.get(res[i], function(err, r)
+        {
+            console.log(r);
+        });
+    }
 });
 
 var time = process.hrtime();
