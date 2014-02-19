@@ -136,7 +136,7 @@ fs.readFile('urls.txt', function(err, logData)
                                     };
                                     conn.count('common_event', doc, function(err, cnt){
                                         if(cnt == 0){
-                                            console.log(conn.databaseTables[0]);
+                                            console.log(conn.databaseTables.Function);
                                             conn.insert('common_event', doc, function(err, recordID){
                                                 if (err)
                                                 {
