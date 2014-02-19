@@ -8,7 +8,7 @@ var redis = require("redis"),
 
 client.get('https://vk.com/wall17424_7030', function(err,res)
 {
-    console.log(JSON.parse(res).link);
+//    console.log(JSON.parse(res).link);
 });
 
 var time = process.hrtime();
@@ -124,7 +124,7 @@ fs.readFile('urls.txt', function(err, logData)
                                         link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                     };
 
-                                    client.set(doc.link, doc);
+                                    client.set(doc.link, JSON.stringify(doc));
 
                                     good_post_count+=1;
                                 }
