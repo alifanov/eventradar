@@ -4,7 +4,7 @@ var https = require('https');
 var async = require('async');
 var request = require('request');
 var mysql = require('mysql'),
-    mysqlUtilities = require('utilities');
+    mysqlUtilities = require('mysql-utilities');
 
 var conn = mysql.createConnection({
     host: 'localhost',
