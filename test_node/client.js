@@ -6,6 +6,8 @@ var request = require('request');
 var redis = require("redis"),
     client = redis.createClient();
 
+client.set('123', '321');
+
 var time = process.hrtime();
 var nums = 0;
 
