@@ -148,6 +148,7 @@ fs.readFile('urls.txt', function(err, logData)
             }
             var diff = process.hrtime(time);
             console.log('DONE %d in %d sec %d nsec [Good: %d]', urls.length, diff[0], diff[1], good_post_count);
+            conn.end();
         }
     });
 
