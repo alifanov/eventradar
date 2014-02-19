@@ -8,7 +8,6 @@ var redis = require("redis"),
 var _ = require('underscore');
 
 var vkid = '194484';
-global.uids = [];
 
 var time = process.hrtime();
 var nums = 0;
@@ -57,18 +56,30 @@ fs.readFile('urls.txt', function(err, logData)
 {
     request.get('https://api.vk.com/method/friends.get?uid='+vkid, function(err, response, body){
         var b = JSON.parse(body);
-        global.uids = body.response;
-        var uids_urls = _.map(global.uids, function(uid){
+        uids = body.response;
+        var uids_urls = _.map(uids, function(uid){
+            client.setnx('uid_'+uid);
             return 'https://api.vk.com/method/friends.get?uid='+uid;
         });
         async.map(uids_urls, fetch, function(err, res)
         {
             for(i in res)
             {
-                global.uids = global.uids.concat(res[i]);
+                var raw_resp = JSON.parse(res[i]);
+                if ('response' in raw_resp)
+                {
+                    _.map(raw_resp.response, function(uid)
+                    {
+                        client.setnx('uid_'+uid);
+                    });
+                }
             }
-            console.log(global.uids.length)
         });
+    });
+
+    client.keys('uid_*', function(err, res)
+    {
+        console.log(res.length)
     });
 /*
     if (err) throw err;
