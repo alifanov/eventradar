@@ -119,7 +119,10 @@ fs.readFile('urls.txt', function(err, logData)
                             }
                             if(posts[ii].text.match(date_exp))
                             {
-                                var dat = posts[ii].text.match(date_exp)[0].replace(/^\s/, '').replace(/\s^/, '').split(' ');
+                                var dat = posts[ii].text.match(date_exp)[0]
+                                    .replace(/^\s/, '')
+                                    .replace(/\s$/, '')
+                                    .split(' ');
                                 var d = new Date(today.getFullYear(), months[dat[1]], dat[0]);
                                 if(d >= today.setHours(0, 0, 0, 0))
                                 {
@@ -133,7 +136,7 @@ fs.readFile('urls.txt', function(err, logData)
                                     };
                                     conn.count('common_event', doc, function(err, cnt){
                                         if(cnt == 0){
-                                            console.log(conn.databaseTables);
+                                            console.log(conn.databaseTables[0]);
                                             conn.insert('common_event', doc, function(err, recordID){
                                                 if (err)
                                                 {
