@@ -17,7 +17,7 @@ conn.connect();
 mysqlUtilities.upgrade(conn);
 mysqlUtilities.introspection(conn);
 
-conn.count('common_ebent', {}, function(err, count)
+conn.count('common_event', {}, function(err, count)
 {
     console.log(count);
 });
