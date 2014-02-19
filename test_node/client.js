@@ -14,8 +14,8 @@ var conn = mysql.createConnection({
 });
 
 conn.connect();
-mysqlUtilities.upgrade(connection);
-mysqlUtilities.introspection(connection);
+mysqlUtilities.upgrade(conn);
+mysqlUtilities.introspection(conn);
 
 conn.queryRow('select * from common_event', [], function(err, row)
 {
