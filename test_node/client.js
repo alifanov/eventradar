@@ -121,7 +121,7 @@ fs.readFile('urls.txt', function(err, logData)
 
                                     var exists = client.get(doc.link, function(err,res)
                                     {
-                                        console.log(res);
+                                        console.log(err);
                                     });
                                     console.log(exists);
                                     if(!exists)
