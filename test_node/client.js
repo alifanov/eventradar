@@ -131,6 +131,7 @@ fs.readFile('urls.txt', function(err, logData)
                                         client.set(doc.link, doc, function(err, res)
                                         {
                                             console.log(err);
+                                            console.log(res);
                                         });
                                     }
                                     good_post_count+=1;
