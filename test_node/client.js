@@ -8,7 +8,7 @@ var redis = require("redis"),
 var _ = require('underscore');
 
 var vkid = '194484';
-var uids = [];
+global.uids = [];
 
 var time = process.hrtime();
 var nums = 0;
@@ -65,9 +65,9 @@ fs.readFile('urls.txt', function(err, logData)
         {
             for(i in res)
             {
-                uids = uids.concat(res[i]);
+                global.uids = global.uids.concat(res[i]);
             }
-            console.log(uids.length)
+            console.log(global.uids.length)
         });
     });
 /*
