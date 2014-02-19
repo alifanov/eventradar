@@ -5,7 +5,7 @@ var async = require('async');
 var request = require('request');
 var redis = require("redis"),
     client = redis.createClient();
-var _ = requre('underscore');
+var _ = require('underscore');
 
 var vkid = '194484';
 var uids = [];
