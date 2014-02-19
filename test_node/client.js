@@ -50,7 +50,7 @@ fs.readFile('urls.txt', function(err, logData)
     console.log('Count: '+urls.length);
     urls = objectDeDup(urls);
     console.log('Count of uniq: '+urls.length);
-    urls = urls.slice(0, 20);
+    urls = urls.slice(0, 40);
     nums = urls.length;
 
     console.log('Count fo urls: ' + urls.length);
@@ -123,7 +123,7 @@ fs.readFile('urls.txt', function(err, logData)
                                     console.log(client);
                                     if(!exists)
                                     {
-                                        client.set(doc.link, '123', hiredis.print);
+                                        client.set(doc.link, doc);
                                     }
 //                                    console.log('[ ' + d.toDateString() + ' ]: ' + posts[ii].text);
                                     good_post_count+=1;
