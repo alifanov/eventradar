@@ -1,0 +1,24 @@
+{
+    "app": {
+        "host": "localhost",
+        "port": 3000,
+        "schema": "http",
+        "url": "http://localhost:3000"
+    },
+
+    "session": {
+        "secret": "it:demo:secret",
+        "key": "sid",
+        "cookie": {
+            "path": "/",
+            "httpOnly": true,
+            "maxAge": null
+        }
+    },
+    "auth": {
+        "vk": {
+            "app_id": 4149541,
+            "secret": "pPGdZM2rVbNySaTBfooe"
+        }
+    }
+}

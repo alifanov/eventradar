@@ -22,6 +22,16 @@ var fetch = function(file,cb){
     });
 };
 
+var fetch_uid = function(file,cb){
+    request.get(file, function(err,response,body){
+        if ( err){
+            cb(err);
+        } else {
+            cb(null, {'body':body, 'uid': file.split('uid=')[0]}); // First param indicates error, null=> no error
+        }
+    });
+};
+
 var date_exp = /(^|\s)([1-9]\d?\s(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))/mgi;
 
 var months = {
@@ -51,122 +61,135 @@ var objectDeDup = function(unordered) {
     return result;
 };
 
-
-fs.readFile('urls.txt', function(err, logData)
-{
+    console.log('Getting uids');
     request.get('https://api.vk.com/method/friends.get?uid='+vkid, function(err, response, body){
         var b = JSON.parse(body);
         uids = b.response;
         var uids_urls = _.map(uids, function(uid){
-            client.setnx('uid_'+uid);
+            client.sadd('uid_'+vkid, uid);
             return 'https://api.vk.com/method/friends.get?uid='+uid;
         });
-        async.map(uids_urls, fetch, function(err, res)
+        console.log('Getting uids [DONE]');
+        console.log('Getting uids of uids');
+        async.map(uids_urls, fetch_uid, function(err, res)
         {
             for(i in res)
             {
-                var raw_resp = JSON.parse(res[i]);
+                var raw_resp = JSON.parse(res[i].body);
                 if ('response' in raw_resp)
                 {
                     _.map(raw_resp.response, function(uid)
                     {
-                        console.log('Set uid: '+uid);
-                        client.setnx('uid_'+uid);
+                        client.sadd('uid_'+res[i].uid, uid);
                     });
                 }
             }
-        });
-    });
+            console.log('Getting uids of uids [DONE]');
 
-    client.keys('uid_*', function(err, res)
-    {
-        console.log(res.length)
-    });
-/*
-    if (err) throw err;
+            console.log('Saving uids in redis');
+            client.save();
+            console.log('Saving uids in redis [DONE]');
 
-    var text = logData.toString();
+            console.log('Getting posts');
 
-
-    var urls = text.split('\n');
-    console.log('Count: '+urls.length);
-    urls = objectDeDup(urls);
-    console.log('Count of uniq: '+urls.length);
-    urls = urls.slice(0, 40);
-    nums = urls.length;
-
-    console.log('Count fo urls: ' + urls.length);
-
-
-    async.map(urls, fetch, function(err, results){
-        if ( err){
-        } else {
-            for(i in results)
+            client.keys('uid_*', function(err, res)
             {
-                var data = JSON.parse(results[i]);
-                if('response' in data)
+                client.sunion(res, function(err, res)
                 {
-                    var posts = data.response.splice(1, 11)
-                    for(ii in posts)
+                    var uids_urls = _.map(res, function(uid)
                     {
-                        var today_exp = /(сегодня)/mgi;
-                        var tomorrow_exp = /(завтра)/mgi;
-                        if(posts[ii].text)
+                        return 'https://api.vk.com/method/wall.get?owner_id='+uid+'&count=10';
+                    });
+                    async.map(uids_urls.slice(0, 20000), fetch, function(err, results)
+                    {
+                        for(i in results)
                         {
-                            var today = new Date();
-                            var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
-
-                            if (posts[ii].text.match(today_exp))
+                            var data = JSON.parse(results[i]);
+                            if('response' in data)
                             {
-                                var d = new Date(posts[ii].date*1000);
-                                if (d.toDateString() == today.toDateString())
+                                var posts = data.response.splice(1, 11);
+                                for(ii in posts)
                                 {
-//                                    console.log('[ today ' + d.toDateString() + ']: ' + posts[ii].text);
-                                    good_post_count+=1;
-                                }
-                            }
-                            if(posts[ii].text.match(tomorrow_exp))
-                            {
-                                var d = new Date(posts[ii].date*1000);
-                                if (tomorrow.toDateString() == d.toDateString())
-                                {
-//                                    console.log('[ tomorrow ' + d.toDateString() + ']: ' + posts[ii].text);
-                                    good_post_count+=1;
-                                }
-                            }
-                            if(posts[ii].text.match(date_exp))
-                            {
-                                var dat = posts[ii].text.match(date_exp)[0]
-                                    .replace(/^\s/, '')
-                                    .replace(/\s$/, '')
-                                    .split(' ');
-                                var d = new Date(today.getFullYear(), months[dat[1]], dat[0]);
-                                if(d >= today.setHours(0, 0, 0, 0))
-                                {
-                                    var doc = {
-                                       id: posts[ii].to_id,
-                                        post_date: new Date(posts[ii].unixtime),
-                                        event_date: d,
-                                        text: posts[ii].text,
-                                        source: posts[ii].to_id,
-                                        link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
-                                    };
+                                    var today_exp = /(сегодня)/mgi;
+                                    var tomorrow_exp = /(завтра)/mgi;
+                                    if(posts[ii].text)
+                                    {
+                                        var today = new Date();
+                                        var tomorrow = new Date(today.getTime() + 24 * 60 * 60 * 1000);
 
-                                    client.setnx(doc.link, JSON.stringify(doc));
+                                        if (posts[ii].text.match(today_exp))
+                                        {
+                                            var d = new Date(posts[ii].date*1000);
+                                            if (d.toDateString() == today.toDateString())
+                                            {
+                                                var doc = {
+                                                    id: posts[ii].to_id,
+                                                    post_date: d,
+                                                    event_date: today.setHours(0, 0, 0, 0),
+                                                    text: posts[ii].text,
+                                                    source: posts[ii].to_id,
+                                                    link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
+                                                };
 
-                                    good_post_count+=1;
+                                                client.sadd('wall_'+doc.id, JSON.stringify(doc), redis.print);
+                                                good_post_count+=1;
+                                            }
+                                        }
+                                        if(posts[ii].text.match(tomorrow_exp))
+                                        {
+                                            var d = new Date(posts[ii].date*1000);
+                                            if (tomorrow.toDateString() == d.toDateString())
+                                            {
+                                                var doc = {
+                                                    id: posts[ii].to_id,
+                                                    post_date: d,
+                                                    event_date: tomorrow.setHours(0, 0, 0, 0),
+                                                    text: posts[ii].text,
+                                                    source: posts[ii].to_id,
+                                                    link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
+                                                };
+
+                                                client.sadd('wall_'+doc.id, JSON.stringify(doc), redis.print);
+                                                good_post_count+=1;
+                                            }
+                                        }
+                                        if(posts[ii].text.match(date_exp))
+                                        {
+                                            var dat = posts[ii].text.match(date_exp)[0]
+                                                .replace(/^\s/, '')
+                                                .replace(/\s$/, '')
+                                                .split(' ');
+                                            var d = new Date(today.getFullYear(), months[dat[1]], dat[0]);
+                                            if(d >= today.setHours(0, 0, 0, 0))
+                                            {
+                                                var doc = {
+                                                    id: posts[ii].to_id,
+                                                    post_date: new Date(posts[ii].unixtime),
+                                                    event_date: d,
+                                                    text: posts[ii].text,
+                                                    source: posts[ii].to_id,
+                                                    link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
+                                                };
+
+                                                client.sadd('wall_'+doc.id, JSON.stringify(doc), redis.print);
+
+                                                good_post_count+=1;
+                                            }
+
+                                        }
+                                    }
                                 }
-
                             }
                         }
-                    }
-                }
-            }
-            client.quit();
-            var diff = process.hrtime(time);
-            console.log('DONE %d in %d sec %d nsec [Good: %d]', urls.length, diff[0], diff[1], good_post_count);
-        }
+                        client.quit(function()
+                        {
+                            console.log('Getting posts [DONE]');
+                            var diff = process.hrtime(time);
+                            console.log('DONE in %d sec %d nsec [Good: %d]', diff[0], diff[1], good_post_count);
+                        });
+
+                    });
+                });
+            });
+        });
     });
-*/
-    client.quit();
-});
