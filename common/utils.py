@@ -48,48 +48,50 @@ def get_date_from_string(date_str):
             date = datetime.date(day = day, month=months[month.lower()], year=now.year)
     return date
 
+def process_for_user(user):
+    # groups
+    u = UserSocialAuth.objects.get(user=user, provider='vk-oauth')
+    resp = requests.get(groups_url\
+    .format(u.uid, u.tokens['access_token']))
+    ids = resp.json()['response']
+    for i in ids[1:]:
+        s,created = Source.objects.get_or_create(
+            name=i['name'],
+            uid='-{}'.format(i['gid'])
+        )
+        s.users.add(u.user)
+    print 'Getting groups [DONE]'
+
+    # friends
+    resp = requests.get(friends_url.format(u.uid))
+    rj = resp.json()
+    ids = rj.get('response', [])
+    i_ids = []
+    for i in ids[1:]:
+        s,created = Source.objects.get_or_create(
+            name=u'{} {}'.format(i['first_name'], i['last_name']),
+            uid=i['uid']
+        )
+        s.users.add(u.user)
+
+    print 'Getting friends [DONE]'
+
+    ids = u.user.sources.values_list('uid', flat=True)
+    urls = map(lambda x: posts_url.format(x), ids)
+    n = 100
+    grouped_urls = [urls[i:i+n] for i in xrange(0, len(urls), n)]
+    for i, grp in enumerate(grouped_urls):
+        print 'Running {}'.format(i)
+        r = (grequests.get(u, verify=False) for u in grp)
+        rsp = grequests.map(r)
+
+        for p in rsp:
+            process_wall(p.json().get('response', []))
 
 def get_all_uids():
     start = time.time()
     for u in UserSocialAuth.objects.filter(provider='vk-oauth'):
-        # groups
-        resp = requests.get(groups_url\
-        .format(u.uid, u.tokens['access_token']))
-        ids = resp.json()['response']
-        for i in ids[1:]:
-            s,created = Source.objects.get_or_create(
-                name=i['name'],
-                uid='-{}'.format(i['gid'])
-            )
-            s.users.add(u.user)
-        print 'Getting groups [DONE]'
-
-        # friends
-        resp = requests.get(friends_url.format(u.uid))
-        rj = resp.json()
-        ids = rj.get('response', [])
-        i_ids = []
-        for i in ids[1:]:
-            s,created = Source.objects.get_or_create(
-                name=u'{} {}'.format(i['first_name'], i['last_name']),
-                uid=i['uid']
-            )
-            s.users.add(u.user)
-
-        print 'Getting friends [DONE]'
-
-        ids = u.user.sources.values_list('uid', flat=True)
-        urls = map(lambda x: posts_url.format(x), ids)
-        n = 100
-        grouped_urls = [urls[i:i+n] for i in xrange(0, len(urls), n)]
-        for i, grp in enumerate(grouped_urls):
-            print 'Running {}'.format(i)
-            r = (grequests.get(u, verify=False) for u in grp)
-            rsp = grequests.map(r)
-
-            for p in rsp:
-                process_wall(p.json().get('response', []))
-
+        process_for_user(u.user)
     print 'End in {}'.format(time.time()-start)
 
 def process_wall(posts):
@@ -121,133 +123,6 @@ def process_wall(posts):
                         event_date = event_date
                     )
                     event.save()
-#
-#    s = Source.objects.values_list('uid', flat=True).distinct()
-#    print s.count()
-#    urls = map(lambda x: 'https://api.vk.com/method/wall.get?owner_id={}&count=10'.format(x), s)
-#    for url in urls:
-#        unirest.get(url, callback=process_wall)
-
-
-class PostProcess(object):
-    """
-    Производит сканирование по друзям и группам пользователя и выдает результат, когда все готово
-    """
-    added_posts = []
-    user = None
-    regexp = re.compile(u'.*(^|\s)([1-9]\d?\s(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))',
-        re.I)
-    pattern_day = re.compile(u'.*(сегодня|завтра)')
-    pattern_today = re.compile(u'.*(сегодня)')
-    pattern_tomorrow = re.compile(u'.*(завтра)')
-
-    def __init__(self, user):
-        self.user=user
-
-    def get_token(self):
-        if UserSocialAuth.objects.filter(user=self.user, provider='vk-oauth').exists():
-            token_dict = UserSocialAuth.objects.get(user=self.user, provider='vk-oauth').tokens
-            return token_dict['access_token']
-        return None
-
-    def call_api(self, method, params):
-        return req_call_api(method, params, self.get_token())
-
-    def get_friends(self):
-        friends = self.call_api('friends.get', {'fields': 'uid, first_name, last_name'})
-        return friends
-
-    def get_groups(self):
-        groups = self.call_api('groups.get',{'extended': '1'})
-        if not groups or len(groups) <= 1: return []
-        return groups[1:]
-
-    def get_date_from_string(self, date_str):
-        date = None
-        if u'сегодня' in date_str:
-            date = datetime.date.today()
-        if u'завтра' in date_str:
-            date = datetime.date.today() + datetime.timedelta(days=1)
-        if u' ' in date_str:
-            day,month = date_str.split(u' ')
-            now = datetime.datetime.now()
-            if day.isdigit():
-                day = int(day)
-                date = datetime.date(day = day, month=months[month.lower()], year=now.year)
-        return date
-
-    def process_posts(self, posts, source):
-        if posts:
-            for post in posts[1:]:
-                if post['text'] and (self.regexp.match(post['text']) or self.pattern_day.match(post['text'])):
-                    date_str = None
-                    if self.regexp.match(post['text']):
-                        f = self.regexp.findall(post['text'])
-                        if f and len(f[0]) > 0:
-                            date_str = f[0][1]
-                    if self.pattern_day.match(post['text']):
-                        f = self.pattern_day.findall(post['text'])
-                        if f and len(f[0]) > 0:
-                            date_str = f[0]
-                    link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
-                    if not Event.objects.filter(link = link).exists():
-                        event_date = self.get_date_from_string(date_str).strftime(u'%Y-%m-%d')
-                        post_date = datetime.datetime.fromtimestamp(int(post['date']))#.strftime('%Y-%m-%d %H:%M:%S')
-                        text = re.sub(u"[^a-zA-Zа-яА-Я0-9.,\-\s\<\>]", "" ,post['text'])
-                        if self.pattern_today.match(text) and not event_date == post_date.today(): continue
-                        if self.pattern_tomorrow.match(text) and not event_date == post_date.today() + datetime.timedelta(days=1): continue
-                        if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
-                            event = Event.objects.create(
-                                text = text,
-                                source = source,
-                                link = link,
-                                post_date = post_date,
-                                event_date = event_date
-                            )
-                            event.users.add(self.user)
-                            event.save()
-                    else:
-                        if not self.user.events.filter(link=link).exists():
-                            e = Event.objects.get(link=link)
-                            e.users.add(self.user)
-                            e.save()
-
-    def wall_get_spawn(self, source, sid):
-        posts = self.call_api('wall.get', {'owner_id': sid, 'count': 10})
-        self.added_posts.append({
-            'source': source,
-            'posts': posts
-        })
-
-    def get_posts(self):
-        friends = self.get_friends()
-        groups = self.get_groups()
-        if friends is None: return None
-
-#        monkey.patch_socket()
-#        monkey.patch_ssl()
-
-        start = time.time()
-
-        threads = []
-        for friend in friends:
-#            threads.append(gevent.spawn(self.wall_get_spawn, ))
-            self.wall_get_spawn(u'{} {}'.format(friend['first_name'], friend['last_name']), friend['uid'])
-
-        for group in groups:
-#            threads.append(gevent.spawn(self.wall_get_spawn, ))
-            self.wall_get_spawn(group['name'], u'-{}'.format(group['gid']))
-
-#        gevent.joinall(threads)
-
-        print len(self.added_posts)
-        for ap in self.added_posts:
-            self.process_posts(ap['posts'], ap['source'])
-
-        print u'Proccessed in {}'.format(time.time() - start)
-
-        return len(friends)+len(groups)
-
 
 def del_old_evens():
     today = datetime.date.today()
