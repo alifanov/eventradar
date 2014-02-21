@@ -54,7 +54,7 @@ def get_all_uids():
         for i in ids[1:]:
             s,created = Source.objects.get_or_create(
                 name=i['name'],
-                uid='-'+i['gid']
+                uid='-{}'.format(i['gid'])
             )
             s.users.add(u.user)
 
