@@ -20,6 +20,7 @@ print len(urls)
 db.close()
 
 def cb(resp):
+    print 'cb'
     try:
         for p in resp.body['response'][1:]:
             print p['to_id']
@@ -29,7 +30,6 @@ def cb(resp):
 #        print resp.raw_body
 
 for url in urls[:10]:
-    print 'run'
     unirest.get(url, callback=cb)
 
 print 'End'
