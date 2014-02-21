@@ -81,7 +81,6 @@ def get_all_uids():
         rsp = map(lambda x: x.json(), rsp)
         rsp = map(lambda x: x.get('response', []), rsp)
         rsp = [y for x in rsp for y in x]
-        rsp = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in rsp)]
 
         print 'Count: {}'.format(len(rsp))
         for bn,ii in enumerate(rsp):
