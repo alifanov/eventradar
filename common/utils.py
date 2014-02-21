@@ -65,7 +65,7 @@ def get_all_uids():
         ids = rj.get('response', [])
         i_ids = []
         r = []
-        for i in ids:
+        for i in ids[1:]:
             s,created = Source.objects.get_or_create(
                 name=u'{} {}'.format(i['first_name'], i['last_name']),
                 uid=i['uid']
@@ -82,7 +82,7 @@ def get_all_uids():
         rsp = [y for x in rsp for y in x]
         rsp = list(set(rsp))
         print 'Count: {}'.format(len(rsp))
-        for bn,ii in enumerate(rsp[:100]):
+        for bn,ii in enumerate(rsp):
             s,created = Source.objects.get_or_create(
                 name=u'{} {}'.format(ii['first_name'], ii['last_name']),
                 uid=ii['uid']
