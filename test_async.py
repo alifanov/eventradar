@@ -87,7 +87,8 @@ def cb(resp):
                         post['to_id'],
                         link
                     )
-                    cursor.execute(query.encode('utf-8'))
+                    print query
+#                    cursor.execute(query.encode('utf-8'))
 #                    event = Event.objects.create(
 #                        text = text,
 #                        source = Source.objects.get(uid=post['to_id']),
