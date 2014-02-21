@@ -83,11 +83,15 @@ def get_all_uids():
         rsp = [y for x in rsp for y in x]
 
         print 'Count: {}'.format(len(rsp))
+        recs = []
         for bn,ii in enumerate(rsp):
-            s,created = Source.objects.get_or_create(
+            recs.append(Source(
                 name=u'{} {}'.format(ii['first_name'], ii['last_name']),
                 uid=ii['uid']
-            )
+            ))
+        Source.objects.bulk_create(recs)
+        ids = [i['uid'] for i in rsp]
+        for s in Source.objects.filter(uid__in=ids):
             s.users.add(u.user)
         print 'Getting others [DONE]'
     print 'End in {}'.format(time.time()-start)
