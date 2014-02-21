@@ -89,6 +89,7 @@ def get_all_uids():
                 name=u'{} {}'.format(ii['first_name'], ii['last_name']),
                 uid=ii['uid']
             ))
+        print 'Get bulk'
         Source.objects.bulk_create(recs)
         ids = [i['uid'] for i in rsp]
         for s in Source.objects.filter(uid__in=ids):
