@@ -45,6 +45,7 @@ def get_date_from_string(date_str):
         now = datetime.datetime.now()
         if day.isdigit():
             day = int(day)
+            if day == 29 and months[month.lower()] == 2 and now.year%12 != 0: return date
             date = datetime.date(day = day, month=months[month.lower()], year=now.year)
     return date
 
