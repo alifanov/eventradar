@@ -90,7 +90,7 @@ def cb(resp):
                         .format(owner_id,
                         post_date.strftime("%Y-%m-%d %H:%M:%S"),
                         event_date,
-                        text,
+                        '',#text,
                         owner_id,
                         link,
                         is_public
