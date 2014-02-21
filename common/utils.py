@@ -14,6 +14,9 @@ pattern_day = re.compile(u'.*(сегодня|завтра)')
 pattern_today = re.compile(u'.*(сегодня)')
 pattern_tomorrow = re.compile(u'.*(завтра)')
 
+friends_url = 'https://api.vk.com/method/friends.get?uid={}&fields=first_name,last_name,uid'
+posts_url = 'https://api.vk.com/method/wall.get?uid={}&count=10'
+groups_url = 'https://api.vk.com/method/groups.get?uid={}&extended=1&access_token={}'
 
 months = {
     u'января': 1,
@@ -49,7 +52,7 @@ def get_all_uids():
     start = time.time()
     for u in UserSocialAuth.objects.filter(provider='vk-oauth'):
         # groups
-        resp = requests.get('https://api.vk.com/method/groups.get?uid={}&extended=1&access_token={}'
+        resp = requests.get(groups_url\
         .format(u.uid, u.tokens['access_token']))
         ids = resp.json()['response']
         for i in ids[1:]:
@@ -61,87 +64,67 @@ def get_all_uids():
         print 'Getting groups [DONE]'
 
         # friends
-        resp = requests.get('https://api.vk.com/method/friends.get?uid={}&fields=first_name,last_name,uid'.format(u.uid))
+        resp = requests.get(friends_url.format(u.uid))
         rj = resp.json()
         ids = rj.get('response', [])
         i_ids = []
-        r = []
         for i in ids[1:]:
             s,created = Source.objects.get_or_create(
                 name=u'{} {}'.format(i['first_name'], i['last_name']),
                 uid=i['uid']
             )
             s.users.add(u.user)
-            r.append('https://api.vk.com/method/friends.get?uid={}&fields=first_name,last_name,uid'.format(i['uid']))
 
         print 'Getting friends [DONE]'
 
-        rr = (grequests.get(rr, verify=False) for rr in r[:100])
-        rsp = grequests.map(rr)
-        rsp = map(lambda x: x.json(), rsp)
-        rsp = map(lambda x: x.get('response', []), rsp)
-        rsp = [y for x in rsp for y in x]
-        rsp_mod = {r['uid']: r for r in rsp}
-        rsp_ids = rsp_mod.keys()
-        rsp_ids = list(set(rsp_ids))
+        ids = u.user.sources.values_list('uid', flat=True)
+        urls = map(lambda x: posts_url.format(x), ids)
+        n = 100
+        grouped_urls = [urls[i:i+n] for i in xrange(0, len(urls), n)]
+        for i, grp in enumerate(grouped_urls):
+            print 'Running {}'.format(i)
+            r = (grequests.get(u, verify=False) for u in grp)
+            rsp = grequests.map(r)
 
-        print 'Count: {}'.format(len(rsp))
-        recs = []
-        for bn,ii in enumerate(rsp_ids):
-            print 'Adding in rec for [{}/{}]'.format(bn, len(rsp))
-            r = rsp_mod[ii]
-            recs.append(Source(
-                name=u'{} {}'.format(r['first_name'], r['last_name']),
-                uid=r['uid']
-            ))
-        print 'Get bulk'
-        Source.objects.bulk_create(recs)
-        print 'After bulk'
-        ids = [i['uid'] for i in rsp]
-        u.user.sources.add([s for s in Source.objects.filter(uid__in=ids)])
-        print 'Getting others [DONE]'
+            for p in rsp:
+                process_wall(rsp)
+
     print 'End in {}'.format(time.time()-start)
 
-#    def process_wall(resp):
-#        posts = []
-#        try:
-#            posts = resp.body.response
-#        except KeyError:
-#            pass
-#        for post in posts:
-#            if post['text'] and (regexp.match(post['text']) or pattern_day.match(post['text'])):
-#                date_str = None
-#                if regexp.match(post['text']):
-#                    f = regexp.findall(post['text'])
-#                    if f and len(f[0]) > 0:
-#                        date_str = f[0][1]
-#                if pattern_day.match(post['text']):
-#                    f = pattern_day.findall(post['text'])
-#                    if f and len(f[0]) > 0:
-#                        date_str = f[0]
-#                link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
-#                if not Event.objects.filter(link = link).exists():
-#                    event_date = get_date_from_string(date_str).strftime(u'%Y-%m-%d')
-#                    post_date = datetime.datetime.fromtimestamp(int(post['date']))#.strftime('%Y-%m-%d %H:%M:%S')
-#                    text = re.sub(u"[^a-zA-Zа-яА-Я0-9.,\-\s\<\>]", "" ,post['text'])
-#                    if pattern_today.match(text) and not event_date == post_date.today(): continue
-#                    if pattern_tomorrow.match(text) and not event_date == post_date.today() + datetime.timedelta(days=1): continue
-#                    if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
-#                        event = Event.objects.create(
-#                            text = text,
-#                            source = Source.objects.get(uid=post['to_id']),
-#                            link = link,
-#                            post_date = post_date,
-#                            event_date = event_date
-#                        )
-#                        event.users.add(u.user)
-#                        event.save()
-#                else:
-#                    if not u.user.events.filter(link=link).exists():
-#                        e = Event.objects.get(link=link)
-#                        e.users.add(u.user)
-#                        e.save()
-
+def process_wall(resp):
+    posts = []
+    try:
+        posts = resp.body.response
+    except KeyError:
+        pass
+    for post in posts:
+        if post['text'] and (regexp.match(post['text']) or pattern_day.match(post['text'])):
+            date_str = None
+            if regexp.match(post['text']):
+                f = regexp.findall(post['text'])
+                if f and len(f[0]) > 0:
+                    date_str = f[0][1]
+            if pattern_day.match(post['text']):
+                f = pattern_day.findall(post['text'])
+                if f and len(f[0]) > 0:
+                    date_str = f[0]
+            link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
+            if not Event.objects.filter(link = link).exists():
+                event_date = get_date_from_string(date_str).strftime(u'%Y-%m-%d')
+                post_date = datetime.datetime.fromtimestamp(int(post['date']))#.strftime('%Y-%m-%d %H:%M:%S')
+                text = re.sub(u"[^a-zA-Zа-яА-Я0-9.,\-\s\<\>]", "" ,post['text'])
+                if pattern_today.match(text) and not event_date == post_date.today(): continue
+                if pattern_tomorrow.match(text) and not event_date == post_date.today() + datetime.timedelta(days=1): continue
+                if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
+                    event = Event.objects.create(
+                        text = text,
+                        source = Source.objects.get(uid=post['to_id']),
+                        link = link,
+                        post_date = post_date,
+                        event_date = event_date
+                    )
+                    event.save()
+#
 #    s = Source.objects.values_list('uid', flat=True).distinct()
 #    print s.count()
 #    urls = map(lambda x: 'https://api.vk.com/method/wall.get?owner_id={}&count=10'.format(x), s)
