@@ -71,7 +71,7 @@ def get_all_uids():
             )
             s.users.add(u.user)
             r.append('https://api.vk.com/method/friends.get?uid={}&fields=first_name,last_name,uid'.format(i['uid']))
-        rr = (grequests.get(rr) for rr in r)
+        rr = (grequests.get(rr, verify=False) for rr in r)
         rsp = grequests.map(rr)
         for i in rsp:
             s,created = Source.objects.get_or_create(
