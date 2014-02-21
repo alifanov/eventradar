@@ -96,9 +96,9 @@ def get_all_uids():
             ))
         print 'Get bulk'
         Source.objects.bulk_create(recs)
+        print 'After bulk'
         ids = [i['uid'] for i in rsp]
-        for s in Source.objects.filter(uid__in=ids):
-            s.users.add(u.user)
+        u.user.sources.add([s for s in Source.objects.filter(uid__in=ids)])
         print 'Getting others [DONE]'
     print 'End in {}'.format(time.time()-start)
 
