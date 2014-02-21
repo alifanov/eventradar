@@ -95,10 +95,13 @@ def cb(resp):
                         link,
                         is_public
                     )
+                    db = MySQLdb.connect(host='localhost', user='eventuser', passwd='eventpass',db='eventdb', charset='utf8')
+
+                    cursor = db.cursor()
+
 #                    r = redis.StrictRedis(host='localhost', port=6379, db=0)
 #                    r.set('posts:{}'.format(post['to_id']), query)
 #                    r.save()
-                    print query.encode('utf-8')
                     cursor.execute(query.encode('utf-8'))
 
     except KeyError:
