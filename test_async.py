@@ -86,7 +86,7 @@ def cb(resp):
                     if owner_id < 0:
                         owner_id = abs(owner_id)
                         is_public = 1
-                    query = u"insert ignore into common_event (owner_id, post_date, event_date,text,source,link, is_public) values ({}, '{}', '{}', '{}', {}, {});"\
+                    query = u"insert ignore into common_event (owner_id, post_date, event_date,text,source,link, is_public) values ({}, '{}', '{}', '{}', '{}', {});"\
                         .format(owner_id,
                         post_date.strftime("%Y-%m-%d %H:%M:%S"),
                         event_date,
