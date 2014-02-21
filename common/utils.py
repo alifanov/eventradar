@@ -45,6 +45,7 @@ def get_date_from_string(date_str):
         if day.isdigit():
             day = int(day)
             date = datetime.date(day = day, month=months[month.lower()], year=now.year)
+    print date
     return date
 
 
@@ -104,7 +105,6 @@ def process_wall(posts):
                 if f and len(f[0]) > 0:
                     date_str = f[0]
             link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
-            print post['to_id']
             if not Event.objects.filter(link = link).exists():
                 event_date = get_date_from_string(date_str).strftime(u'%Y-%m-%d')
                 post_date = datetime.datetime.fromtimestamp(int(post['date']))#.strftime('%Y-%m-%d %H:%M:%S')
