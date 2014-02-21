@@ -1,7 +1,23 @@
-f = open('urls.txt')
-urls = f.readlines()
-
+import MySQLdb
 import unirest
+
+db = MySQLdb.connect(host='localhost', user='eventuser', password='eventpass',db='eventdb', charset='utf8')
+
+cursor = db.cursor()
+
+sql = 'SELECT uid from common_source;'
+
+cursor.execute(sql)
+
+data = cursor.fetchall()
+
+urls = []
+for u in data:
+    urls.append(
+        'https://api.vk.com/method/wall.get?uid={}&count=10'.format(u)
+    )
+print len(urls)
+db.close()
 
 def cb(resp):
     try:
