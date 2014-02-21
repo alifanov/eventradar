@@ -19,11 +19,11 @@ def get_date_from_string(date_str):
         date = datetime.date.today() + datetime.timedelta(days=1)
     if u' ' in date_str:
         day,month = date_str.split(u' ')
+        print day,month
         now = datetime.datetime.now()
         if day.isdigit():
             day = int(day)
-            if month.lower() in months:
-                date = datetime.date(day = day, month=months[month.lower()], year=now.year)
+            date = datetime.date(day = day, month=months[month.lower()], year=now.year)
     return date
 
 months = {
