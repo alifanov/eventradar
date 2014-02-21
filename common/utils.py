@@ -35,6 +35,7 @@ months = {
 
 def get_date_from_string(date_str):
     date = None
+    print date_str
     if u'сегодня' in date_str:
         date = datetime.date.today()
     if u'завтра' in date_str:
@@ -45,7 +46,6 @@ def get_date_from_string(date_str):
         if day.isdigit():
             day = int(day)
             date = datetime.date(day = day, month=months[month.lower()], year=now.year)
-    print date
     return date
 
 
