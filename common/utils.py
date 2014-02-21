@@ -15,7 +15,7 @@ pattern_today = re.compile(u'.*(сегодня)')
 pattern_tomorrow = re.compile(u'.*(завтра)')
 
 friends_url = 'https://api.vk.com/method/friends.get?uid={}&fields=first_name,last_name,uid'
-posts_url = 'https://api.vk.com/method/wall.get?uid={}&count=10'
+posts_url = 'https://api.vk.com/method/wall.get?owner_id={}&count=10'
 groups_url = 'https://api.vk.com/method/groups.get?uid={}&extended=1&access_token={}'
 
 months = {
