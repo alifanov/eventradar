@@ -90,51 +90,51 @@ def get_all_uids():
             s.users.add(u.user)
         print 'Getting others [DONE]'
 
-    def process_wall(resp):
-        posts = []
-        try:
-            posts = resp.body.response
-        except KeyError:
-            pass
-        for post in posts:
-            if post['text'] and (regexp.match(post['text']) or pattern_day.match(post['text'])):
-                date_str = None
-                if regexp.match(post['text']):
-                    f = regexp.findall(post['text'])
-                    if f and len(f[0]) > 0:
-                        date_str = f[0][1]
-                if pattern_day.match(post['text']):
-                    f = pattern_day.findall(post['text'])
-                    if f and len(f[0]) > 0:
-                        date_str = f[0]
-                link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
-                if not Event.objects.filter(link = link).exists():
-                    event_date = get_date_from_string(date_str).strftime(u'%Y-%m-%d')
-                    post_date = datetime.datetime.fromtimestamp(int(post['date']))#.strftime('%Y-%m-%d %H:%M:%S')
-                    text = re.sub(u"[^a-zA-Zа-яА-Я0-9.,\-\s\<\>]", "" ,post['text'])
-                    if pattern_today.match(text) and not event_date == post_date.today(): continue
-                    if pattern_tomorrow.match(text) and not event_date == post_date.today() + datetime.timedelta(days=1): continue
-                    if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
-                        event = Event.objects.create(
-                            text = text,
-                            source = Source.objects.get(uid=post['to_id']),
-                            link = link,
-                            post_date = post_date,
-                            event_date = event_date
-                        )
-                        event.users.add(u.user)
-                        event.save()
-                else:
-                    if not u.user.events.filter(link=link).exists():
-                        e = Event.objects.get(link=link)
-                        e.users.add(u.user)
-                        e.save()
+#    def process_wall(resp):
+#        posts = []
+#        try:
+#            posts = resp.body.response
+#        except KeyError:
+#            pass
+#        for post in posts:
+#            if post['text'] and (regexp.match(post['text']) or pattern_day.match(post['text'])):
+#                date_str = None
+#                if regexp.match(post['text']):
+#                    f = regexp.findall(post['text'])
+#                    if f and len(f[0]) > 0:
+#                        date_str = f[0][1]
+#                if pattern_day.match(post['text']):
+#                    f = pattern_day.findall(post['text'])
+#                    if f and len(f[0]) > 0:
+#                        date_str = f[0]
+#                link = u'https://vk.com/wall{}_{}'.format(post['to_id'], post['id'])
+#                if not Event.objects.filter(link = link).exists():
+#                    event_date = get_date_from_string(date_str).strftime(u'%Y-%m-%d')
+#                    post_date = datetime.datetime.fromtimestamp(int(post['date']))#.strftime('%Y-%m-%d %H:%M:%S')
+#                    text = re.sub(u"[^a-zA-Zа-яА-Я0-9.,\-\s\<\>]", "" ,post['text'])
+#                    if pattern_today.match(text) and not event_date == post_date.today(): continue
+#                    if pattern_tomorrow.match(text) and not event_date == post_date.today() + datetime.timedelta(days=1): continue
+#                    if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
+#                        event = Event.objects.create(
+#                            text = text,
+#                            source = Source.objects.get(uid=post['to_id']),
+#                            link = link,
+#                            post_date = post_date,
+#                            event_date = event_date
+#                        )
+#                        event.users.add(u.user)
+#                        event.save()
+#                else:
+#                    if not u.user.events.filter(link=link).exists():
+#                        e = Event.objects.get(link=link)
+#                        e.users.add(u.user)
+#                        e.save()
 
-    s = Source.objects.values_list('uid', flat=True).distinct()
-    print s.count()
-    urls = map(lambda x: 'https://api.vk.com/method/wall.get?owner_id={}&count=10'.format(x), s)
-    for url in urls:
-        unirest.get(url, callback=process_wall)
+#    s = Source.objects.values_list('uid', flat=True).distinct()
+#    print s.count()
+#    urls = map(lambda x: 'https://api.vk.com/method/wall.get?owner_id={}&count=10'.format(x), s)
+#    for url in urls:
+#        unirest.get(url, callback=process_wall)
 
 
 class PostProcess(object):
