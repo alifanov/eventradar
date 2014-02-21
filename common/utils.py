@@ -48,8 +48,9 @@ def get_date_from_string(date_str):
 def get_all_uids():
     for u in UserSocialAuth.objects.filter(provider='vk-oauth'):
         # groups
-        ids = requests.get('https://api.vk.com/method/groups.get?uid={}&extended=1&access_token={}'
+        resp = requests.get('https://api.vk.com/method/groups.get?uid={}&extended=1&access_token={}'
         .format(u.uid, u.tokens['access_token']))
+        ids = json.loads(resp)
         for i in ids[1:]:
             s,created = Source.objects.get_or_create(
                 name=i['name'],
