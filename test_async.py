@@ -22,7 +22,8 @@ def get_date_from_string(date_str):
         now = datetime.datetime.now()
         if day.isdigit():
             day = int(day)
-            date = datetime.date(day = day, month=months[month.lower()]-1, year=now.year)
+            if month.lower() in months:
+                date = datetime.date(day = day, month=months[month.lower()], year=now.year)
     return date
 
 months = {
