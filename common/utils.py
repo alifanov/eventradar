@@ -77,15 +77,17 @@ def get_all_uids():
 
         rr = (grequests.get(rr, verify=False) for rr in r)
         rsp = grequests.map(rr)
-        for an, i in enumerate(rsp):
-            n = i.json()
-            for bn,ii in enumerate(n.get('response', [])):
-                print 'Processing {}.{}'.format(an, bn)
-                s,created = Source.objects.get_or_create(
-                    name=u'{} {}'.format(ii['first_name'], ii['last_name']),
-                    uid=ii['uid']
-                )
-                s.users.add(u.user)
+        rsp = map(lambda x: x.json(), rsp)
+        rsp = map(lambda x: x.get('response', []), rsp)
+        rsp = [y for x in rsp for y in x]
+        print 'Count: {}'.format(len(rsp))
+        for bn,ii in enumerate(rsp):
+            print 'Processing {}'.format(bn)
+            s,created = Source.objects.get_or_create(
+                name=u'{} {}'.format(ii['first_name'], ii['last_name']),
+                uid=ii['uid']
+            )
+            s.users.add(u.user)
         print 'Getting others [DONE]'
 
 #    def process_wall(resp):
