@@ -81,6 +81,8 @@ def get_all_uids():
         rsp = map(lambda x: x.get('response', []), rsp)
         rsp = [y for x in rsp for y in x]
         rsp = list(set(rsp))
+        rsp = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in rsp)]
+
         print 'Count: {}'.format(len(rsp))
         for bn,ii in enumerate(rsp):
             s,created = Source.objects.get_or_create(
