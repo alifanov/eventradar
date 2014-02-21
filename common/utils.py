@@ -178,7 +178,7 @@ class PostProcess(object):
 
     def process_posts(self, posts, source):
         if posts:
-            for post in posts[1:]:
+            for post in posts:
                 if post['text'] and (self.regexp.match(post['text']) or self.pattern_day.match(post['text'])):
                     date_str = None
                     if self.regexp.match(post['text']):
