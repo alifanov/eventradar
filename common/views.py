@@ -83,7 +83,7 @@ class HomeView(ListView):
     template_name = 'home.html'
     context_object_name = 'posts'
 
-    def get_queryset(self):
-        if self.request.user.is_authenticated():
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.is_authenticated():
             return HttpResponseRedirect('/today/')
-        return Event.objects.none()
+        super(HomeView, self).dispatch(request, *args, **kwargs)
