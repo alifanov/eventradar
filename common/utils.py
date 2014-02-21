@@ -81,8 +81,8 @@ def get_all_uids():
             n = i.json()
             for ii in n.get('response', []):
                 s,created = Source.objects.get_or_create(
-                    name=u'{} {}'.format(i['first_name'], i['last_name']),
-                    uid=i['uid']
+                    name=u'{} {}'.format(ii['first_name'], ii['last_name']),
+                    uid=ii['uid']
                 )
                 s.users.add(u.user)
         print 'Getting others [DONE]'
