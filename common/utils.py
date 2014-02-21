@@ -87,12 +87,12 @@ def get_all_uids():
             rsp = grequests.map(r)
 
             for p in rsp:
+                print p.json()
                 process_wall(p.json().get('response', []))
 
     print 'End in {}'.format(time.time()-start)
 
 def process_wall(posts):
-    print posts
     for post in posts:
         if post['text'] and (regexp.match(post['text']) or pattern_day.match(post['text'])):
             date_str = None
