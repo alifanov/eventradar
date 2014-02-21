@@ -13,6 +13,7 @@ data = cursor.fetchall()
 
 urls = []
 for u in data:
+    print u
     urls.append(
         'https://api.vk.com/method/wall.get?owner_id={}&count=10'.format(u)
     )
