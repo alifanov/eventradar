@@ -77,9 +77,10 @@ def get_all_uids():
 
         rr = (grequests.get(rr, verify=False) for rr in r)
         rsp = grequests.map(rr)
-        for i in rsp:
+        for an, i in enumerate(rsp):
             n = i.json()
-            for ii in n.get('response', []):
+            for bn,ii in enumerate(n.get('response', [])):
+                print 'Processing {}.{}'.format(an, bn)
                 s,created = Source.objects.get_or_create(
                     name=u'{} {}'.format(ii['first_name'], ii['last_name']),
                     uid=ii['uid']
@@ -87,31 +88,6 @@ def get_all_uids():
                 s.users.add(u.user)
         print 'Getting others [DONE]'
 
-
-
-#    uids = UserSocialAuth.objects.filter(provider='vk-oauth').values_list('uid', flat=True)
-#
-#    # get all friends
-#    r = (grequests.get(u) for u in map(lambda x: 'https://api.vk.com/method/friends.get?uid={}&fields=first_name,last_name,uid'.format(x), uids))
-#    rs = grequests.map(r)
-#    uus = map(lambda x: json.loads(x), rs)
-#    uus = [y for x in uus for y in x]
-#    for p in uus:
-#        Source.objects.create(name=u'{} {}'.format(p['first_name'], p['last_name']), uid=p['uid'])
-#    uus = [p['uid'] for p in uus]
-#    uus = list(set(uus))
-#
-#    # get all friends of uniq list of friends
-#    r = (grequests.get(u) for u in map(lambda x: 'https://api.vk.com/method/friends.get?uid={}&fields=first_name,last_name,uid'.format(x), uids))
-#    rs = grequests.map(r)
-#    uus = map(lambda x: json.loads(x), rs)
-#    uus = [y for x in uus for y in x]
-#    for p in uus:
-#        Source.objects.create(name=u'{} {}'.format(p['first_name'], p['last_name']), uid=p['uid'])
-#        uus = [p['uid'] for p in uus]
-#    # rest only uniq friends
-#    uus = list(set(uus))
-#
 #    def process_wall(resp):
 #        posts = []
 #        try:
