@@ -95,6 +95,7 @@ def cb(resp):
                     )
                     r = redis.StrictRedis(host='localhost', port=6379, db=0)
                     r.set('posts:{}'.format(post['to_id']), query)
+                    r.bgsave()
 #                    print query.encode('utf-8')
 #                    cursor.execute(query.encode('utf-8'))
 
