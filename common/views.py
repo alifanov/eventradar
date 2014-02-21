@@ -45,22 +45,25 @@ class TomorrowEventsView(TodayEventsView):
     active = 'tomorrow'
 
     def get_queryset(self):
+        sources_ids = self.request.user.sources.values_list('uid', flat=True)
         tomorrow = datetime.date.today() + datetime.timedelta(days=1)
-        return self.request.user.events.filter(event_date=tomorrow).order_by('event_date')
+        return Event.objects.filter(owner_id__in=sources_ids, event_date=tomorrow).order_by('event_date')
 
 class WeekEventsView(TodayEventsView):
     active = 'week'
 
     def get_queryset(self):
+        sources_ids = self.request.user.sources.values_list('uid', flat=True)
         week = datetime.date.today() + datetime.timedelta(days=7)
-        return self.request.user.events.filter(event_date__lte=week).order_by('event_date')
+        return Event.objects.filter(owner_id__in=sources_ids, event_date__lte=week).order_by('event_date')
 
 class MonthEventsView(TodayEventsView):
     active = 'month'
 
     def get_queryset(self):
+        sources_ids = self.request.user.sources.values_list('uid', flat=True)
         month = datetime.date.today() + datetime.timedelta(days=30)
-        return self.request.user.events.filter(event_date__lte=month).order_by('event_date')
+        return Event.objects.filter(owner_id__in=sources_ids, event_date__lte=month).order_by('event_date')
 
 class FeedbackView(TemplateView):
     template_name = 'feedback.html'
