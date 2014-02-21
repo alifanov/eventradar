@@ -59,7 +59,9 @@ def get_all_uids():
             s.users.add(u.user)
 
         # friends
-        ids = requests.get('https://api.vk.com/method/friends.get?uid={}&fields=first_name,last_name,uid'.format(u.uid))
+        resp = requests.get('https://api.vk.com/method/friends.get?uid={}&fields=first_name,last_name,uid'.format(u.uid))
+        rj = resp.json()
+        ids = rj.get('response', [])
         i_ids = []
         r = []
         for i in ids:
