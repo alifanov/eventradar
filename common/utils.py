@@ -76,7 +76,7 @@ def get_all_uids():
 
         print 'Getting friends [DONE]'
 
-        rr = (grequests.get(rr, verify=False) for rr in r)
+        rr = (grequests.get(rr, verify=False) for rr in r[:10000])
         rsp = grequests.map(rr)
         rsp = map(lambda x: x.json(), rsp)
         rsp = map(lambda x: x.get('response', []), rsp)
