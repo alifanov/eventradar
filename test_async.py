@@ -23,6 +23,8 @@ def get_date_from_string(date_str):
         now = datetime.datetime.now()
         if day.isdigit():
             day = int(day)
+            if day > 31:
+                day %= 100
             date = datetime.date(day = day, month=months[month.lower()], year=now.year)
     return date
 
