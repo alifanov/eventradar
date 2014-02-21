@@ -85,7 +85,7 @@ def cb(resp):
                         event_date,
                         text,
                         post['to_id'],
-                        link
+                        link.encode('utf-8')
                     ))
 #                    event = Event.objects.create(
 #                        text = text,
