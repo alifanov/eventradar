@@ -81,14 +81,18 @@ def get_all_uids():
         rsp = map(lambda x: x.json(), rsp)
         rsp = map(lambda x: x.get('response', []), rsp)
         rsp = [y for x in rsp for y in x]
+        rsp_ids = [r['uid'] for r in rsp]
+        rsp_ids = list(set(rsp_ids))
+        rsp_mod = {r['uid']: r for r in rsp}
 
         print 'Count: {}'.format(len(rsp))
         recs = []
-        for bn,ii in enumerate(rsp):
+        for bn,ii in enumerate(rsp_ids):
             print 'Adding in rec for [{}/{}]'.format(bn, len(rsp))
+            r = rsp_mod[ii]
             recs.append(Source(
-                name=u'{} {}'.format(ii['first_name'], ii['last_name']),
-                uid=ii['uid']
+                name=u'{} {}'.format(r['first_name'], r['last_name']),
+                uid=r['uid']
             ))
         print 'Get bulk'
         Source.objects.bulk_create(recs)
