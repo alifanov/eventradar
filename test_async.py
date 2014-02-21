@@ -25,7 +25,7 @@ def cb(resp):
             print p['to_id']
 
     except KeyError:
-#        pass
+        pass
 
 for url in urls[:10]:
     unirest.get(url, callback=cb)
