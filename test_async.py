@@ -83,7 +83,7 @@ def cb(resp):
                     .format(post['to_id'],
                         post_date.isoformat(),
                         event_date,
-                        text.encode('utf-8'),
+                        text.decode('utf-8'),
                         post['to_id'],
                         link
                     ))
