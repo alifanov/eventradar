@@ -1,7 +1,7 @@
 # coding: utf-8
 import MySQLdb
 import unirest
-import re
+import re, redis
 import datetime
 
 # reg exps
@@ -93,13 +93,15 @@ def cb(resp):
                         link,
                         is_public
                     )
+                    r = redis.StrictRedis(host='localhost', port=6379, db=0)
+                    r.set('posts:{}'.format(post['to_id']))
 #                    print query.encode('utf-8')
-                    cursor.execute(query.encode('utf-8'))
+#                    cursor.execute(query.encode('utf-8'))
 
     except KeyError:
         pass
 
-for url in urls[:100]:
+for url in urls[:10]:
     unirest.get(url, callback=cb)
 
 print 'End'
