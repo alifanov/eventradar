@@ -1,7 +1,7 @@
 import MySQLdb
 import unirest
 
-db = MySQLdb.connect(host='localhost', user='eventuser', password='eventpass',db='eventdb', charset='utf8')
+db = MySQLdb.connect(host='localhost', user='eventuser', passwd='eventpass',db='eventdb', charset='utf8')
 
 cursor = db.cursor()
 
