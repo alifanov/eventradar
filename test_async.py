@@ -93,8 +93,8 @@ def cb(resp):
                         link,
                         is_public
                     )
-                    print query.encode('utf-8')
-#                    cursor.execute(query.encode('utf-8'))
+#                    print query.encode('utf-8')
+                    cursor.execute(query.encode('utf-8'))
 #                    event = Event.objects.create(
 #                        text = text,
 #                        source = Source.objects.get(uid=post['to_id']),
