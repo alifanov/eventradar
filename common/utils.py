@@ -74,11 +74,13 @@ def get_all_uids():
         rr = (grequests.get(rr, verify=False) for rr in r)
         rsp = grequests.map(rr)
         for i in rsp:
-            s,created = Source.objects.get_or_create(
-                name=u'{} {}'.format(i['first_name'], i['last_name']),
-                uid=i['uid']
-            )
-            s.users.add(u.user)
+            n = i.json()
+            for ii in i.get('response', []):
+                s,created = Source.objects.get_or_create(
+                    name=u'{} {}'.format(i['first_name'], i['last_name']),
+                    uid=i['uid']
+                )
+                s.users.add(u.user)
 
 
 
