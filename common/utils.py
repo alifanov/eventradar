@@ -76,7 +76,9 @@ def process_for_user(user):
 
     print 'Getting friends [DONE]'
 
-    ids = u.user.sources.values_list('uid', flat=True)
+    ss = u.user.sources.all()
+    dict_ss = {s['uid'] for s in ss}
+    ids = ss.values_list('uid', flat=True)
     urls = map(lambda x: posts_url.format(x), ids)
     n = 100
     grouped_urls = [urls[i:i+n] for i in xrange(0, len(urls), n)]
@@ -86,7 +88,7 @@ def process_for_user(user):
         rsp = grequests.map(r)
 
         for p in rsp:
-            process_wall(p.json().get('response', []))
+            process_wall(p.json().get('response', []), dict_ss)
 
 def get_all_uids():
     start = time.time()
@@ -94,7 +96,7 @@ def get_all_uids():
         process_for_user(u.user)
     print 'End in {}'.format(time.time()-start)
 
-def process_wall(posts):
+def process_wall(posts, uids_dict):
     for post in posts[1:]:
         if post['text'] and (regexp.match(post['text']) or pattern_day.match(post['text'])):
             date_str = None
@@ -119,6 +121,7 @@ def process_wall(posts):
                         text = text,
                         owner_id = post['to_id'],
                         link = link,
+                        source = uids_dict[post['to_id']],
                         post_date = post_date,
                         event_date = event_date
                     )
