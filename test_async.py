@@ -79,14 +79,15 @@ def cb(resp):
                 if pattern_today.match(text) and not event_date == post_date.today(): continue
                 if pattern_tomorrow.match(text) and not event_date == post_date.today() + datetime.timedelta(days=1): continue
                 if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
-                    cursor.execute(u'insert ignore into common_event (owner_id, post_date, event_date,text,source,link) values ({}, {}, {}, {}, {}, {})'
-                    .format(post['to_id'],
+                    query = u'insert ignore into common_event (owner_id, post_date, event_date,text,source,link) values ({}, {}, {}, {}, {}, {})'\
+                        .format(post['to_id'],
                         post_date.isoformat(),
                         event_date,
                         text,
                         post['to_id'],
                         link
-                    ))
+                    )
+                    cursor.execute(query.encode('utf-8'))
 #                    event = Event.objects.create(
 #                        text = text,
 #                        source = Source.objects.get(uid=post['to_id']),
