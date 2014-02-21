@@ -13,7 +13,6 @@ data = cursor.fetchall()
 
 urls = []
 for u in data:
-    print u[0]
     urls.append(
         'https://api.vk.com/method/wall.get?owner_id={}&count=10'.format(u[0])
     )
@@ -27,7 +26,6 @@ def cb(resp):
 
     except KeyError:
 #        pass
-        print resp.raw_body
 
 for url in urls[:10]:
     unirest.get(url, callback=cb)
