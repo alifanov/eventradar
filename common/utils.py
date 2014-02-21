@@ -85,6 +85,7 @@ def get_all_uids():
         print 'Count: {}'.format(len(rsp))
         recs = []
         for bn,ii in enumerate(rsp):
+            print 'Adding in rec for [{}/{}]'.format(bn, len(rsp))
             recs.append(Source(
                 name=u'{} {}'.format(ii['first_name'], ii['last_name']),
                 uid=ii['uid']
