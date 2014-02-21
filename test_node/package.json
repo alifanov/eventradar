@@ -1,0 +1,8 @@
+{
+    "name": "test_node",
+    "description": "test for node vk parser",
+    "version": "0.1.0",
+    "author": "",
+    "dependencies": {},
+    "devDependencies": {}
+}

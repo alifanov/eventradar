@@ -9,13 +9,14 @@ passport.use('vk', new AuthVKStrategy({
     },
     function (accessToken, refreshToken, profile, done) {
 
-        //console.log("facebook auth: ", profile);
+        console.log("vkontakte auth: ", profile);
 
         return done(null, {
             uid: profile.id,
             username: profile.displayName,
             photoUrl: profile.photos[0].value,
-            profileUrl: profile.profileUrl
+            profileUrl: profile.profileUrl,
+            access_token: accessToken
         });
     }
 ));

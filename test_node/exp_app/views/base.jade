@@ -1,0 +1,32 @@
+doctype html
+html
+  head
+    title= title
+    link(rel='stylesheet', href='//netdna.bootstrapcdn.com/bootstrap/3.0.3/css/bootstrap.min.css')
+    link(rel='stylesheet', href='https://code.jquery.com/jquery.js')
+    //link(rel='stylesheet', href='/stylesheets/style.css')
+    script(src='http://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js')
+  body
+    nav.navbar.navbar-default
+        .container
+            .navbar-header
+                a.navbar-brand(href="/") Events Radar
+            .navbar-collapse.collapse
+                ul.nav.navbar-nav
+                    li
+                        a(href="#") О проекте
+                    li
+                        a(href="#") Контакты
+                    li
+                        a(href="#") Обратная связь
+                ul.nav.navbar-nav.navbar-right
+                    if (user)
+                        li
+                            a(href="#",onclick="javascript: return false;") #{user.username}
+                        li
+                            a.glyphicon.glyphicon-log-out(href="/sign-out")
+                    else
+                        li
+                            a(href="/auth/vk") Авторизоваться в VK.com
+    block content
+    script(src='//netdna.bootstrapcdn.com/bootstrap/3.0.3/js/bootstrap.min.js')

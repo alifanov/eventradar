@@ -3,6 +3,8 @@ var request = require('request');
 var redis = require("redis"),
     client = redis.createClient();
 
+var User = require('../models/users').User;
+
 var async = require('async');
 
 module.exports = function (app) {
@@ -13,7 +15,7 @@ module.exports = function (app) {
     });
     app.get('/auth/vk',
         passport.authenticate('vk', {
-            scope: ['offline']
+            scope: ['groups']
         }),
         function (req, res) {
             // The request will be redirected to vk.com
@@ -23,7 +25,7 @@ module.exports = function (app) {
 
     app.get('/auth/vk/callback',
         passport.authenticate('vk', {
-            failureRedirect: '/auth'
+            failureRedirect: '/'
         }),
         function (req, res) {
             // Successful authentication
@@ -33,11 +35,12 @@ module.exports = function (app) {
                 body = JSON.parse(body);
                 if ('response' in body)
                 {
-                    async.map(body.response, function(n)
-                    {
-                        client.sadd('uids_'+req.user.uid, n);
-                    }, function(err, results){
-                        client.end();
+                    client.sadd('uid_'+req.user.uid, body.response);
+                    User.findOrCreate({
+                        username: req.user.username,
+                        uid: req.user.uid,
+                        friends: body.response,
+                        access_token: req.user.access_token
                     });
                 }
             });

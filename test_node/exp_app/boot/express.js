@@ -3,13 +3,21 @@ var express = require('express');
 var passport = require('passport');
 var path = require('path');
 var flash = require('connect-flash');
+var truncate = require('html-truncate');
+
+var jade = require('jade'),
+    jade_filters = jade.filters;
+
+jade_filters.truncate = function(text)
+{
+    return truncate(text, 300);
+};
 
 module.exports = function (app) {
 
     app.set('port', config.get("app:port") || 3000);
     app.set('views', path.join(__dirname + "/..", 'views'));
     app.set('view engine', 'jade');
-
     var sessionOptions = config.get("session");
     // сделать через redis
 //    if ('production' == app.get('env')) {

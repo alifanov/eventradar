@@ -3,8 +3,6 @@ var url = require('url');
 var https = require('https');
 var async = require('async');
 var request = require('request');
-var redis = require("redis"),
-    client = redis.createClient();
 var _ = require('underscore');
 
 var vkid = '194484';
@@ -27,7 +25,8 @@ var fetch_uid = function(file,cb){
         if ( err){
             cb(err);
         } else {
-            cb(null, {'body':body, 'uid': file.split('uid=')[0]}); // First param indicates error, null=> no error
+            var b = JSON.parse(body);
+            cb(null, {'body': b.response, 'uid': file.split('uid=')[1]}); // First param indicates error, null=> no error
         }
     });
 };
@@ -61,34 +60,27 @@ var objectDeDup = function(unordered) {
     return result;
 };
 
-    console.log('Getting uids');
+console.log('Getting uids');
     request.get('https://api.vk.com/method/friends.get?uid='+vkid, function(err, response, body){
         var b = JSON.parse(body);
         uids = b.response;
         var uids_urls = _.map(uids, function(uid){
-            client.sadd('uid_'+vkid, uid);
+//              client.sadd('uid_'+vkid, uid);
             return 'https://api.vk.com/method/friends.get?uid='+uid;
         });
-        console.log('Getting uids [DONE]');
-        console.log('Getting uids of uids');
-        async.map(uids_urls, fetch_uid, function(err, res)
-        {
-            for(i in res)
-            {
-                var raw_resp = JSON.parse(res[i].body);
-                if ('response' in raw_resp)
-                {
-                    _.map(raw_resp.response, function(uid)
-                    {
-                        client.sadd('uid_'+res[i].uid, uid);
-                    });
-                }
-            }
-            console.log('Getting uids of uids [DONE]');
+        var diff = process.hrtime(time);
 
-            console.log('Saving uids in redis');
-            client.save();
-            console.log('Saving uids in redis [DONE]');
+        console.log('Getting uids [DONE] in %d sec %d nsec', diff[0], diff[1]);
+        console.log('Getting uids of uids');
+
+        async.map(uids_urls.slice(0,40), fetch_uid, function(err, res)
+        {
+            res = _.pluck(res, 'body');
+            console.log(res.length);
+            var all_ids = _.uniq(_.flatten(res));
+            console.log(all_ids.length);
+
+            console.log('Getting uids of uids [DONE] in %d sec %d nsec', diff[0], diff[1]);
 
             console.log('Getting posts');
 
@@ -100,7 +92,7 @@ var objectDeDup = function(unordered) {
                     {
                         return 'https://api.vk.com/method/wall.get?owner_id='+uid+'&count=10';
                     });
-                    async.map(uids_urls.slice(0, 20000), fetch, function(err, results)
+                    async.map(uids_urls.slice(0, 2000), fetch, function(err, results)
                     {
                         for(i in results)
                         {
@@ -131,7 +123,8 @@ var objectDeDup = function(unordered) {
                                                     link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                                 };
 
-                                                client.sadd('wall_'+doc.id, JSON.stringify(doc), redis.print);
+//                                                client.sadd('wall_'+doc.id, JSON.stringify(doc), redis.print);
+//                                                client.hset('walls', doc.id, JSON.stringify(doc));
                                                 good_post_count+=1;
                                             }
                                         }
@@ -149,7 +142,8 @@ var objectDeDup = function(unordered) {
                                                     link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                                 };
 
-                                                client.sadd('wall_'+doc.id, JSON.stringify(doc), redis.print);
+//                                                client.sadd('wall_'+doc.id, JSON.stringify(doc), redis.print);
+//                                                client.hset('walls', doc.id, JSON.stringify(doc));
                                                 good_post_count+=1;
                                             }
                                         }
@@ -164,14 +158,15 @@ var objectDeDup = function(unordered) {
                                             {
                                                 var doc = {
                                                     id: posts[ii].to_id,
-                                                    post_date: new Date(posts[ii].unixtime),
-                                                    event_date: d,
+                                                    post_date: posts[ii].date,
+                                                    event_date:d.getTime(),
                                                     text: posts[ii].text,
                                                     source: posts[ii].to_id,
                                                     link: 'https://vk.com/wall'+posts[ii].to_id + '_' + posts[ii].id
                                                 };
 
-                                                client.sadd('wall_'+doc.id, JSON.stringify(doc), redis.print);
+//                                                client.sadd('wall_'+doc.id, JSON.stringify(doc), redis.print);
+//                                                client.hset('walls', doc.id, JSON.stringify(doc));
 
                                                 good_post_count+=1;
                                             }
@@ -181,12 +176,9 @@ var objectDeDup = function(unordered) {
                                 }
                             }
                         }
-                        client.quit(function()
-                        {
-                            console.log('Getting posts [DONE]');
-                            var diff = process.hrtime(time);
-                            console.log('DONE in %d sec %d nsec [Good: %d]', diff[0], diff[1], good_post_count);
-                        });
+                        console.log('Getting posts [DONE]');
+                        var diff = process.hrtime(time);
+                        console.log('DONE in %d sec %d nsec [Good: %d]', diff[0], diff[1], good_post_count);
 
                     });
                 });

@@ -1,0 +1,37 @@
+extends base
+
+block content
+    if(user)
+        .container
+            h3.pull-left(style="margin-top: 15px;") Все новости
+            .btn-group.pull-right
+                a.btn(href="/today/",class=current=='today'?'btn-primary':'btn-default') Сегодня
+                a.btn(href="/tomorrow/", class=current=='tomorrow'?'btn-primary':'btn-default') Завтра
+                a.btn(href="/week/", class=current=='week'?'btn-primary':'btn-default') На неделе
+                a.btn(href="/month/", class=current=='month'?'btn-primary':'btn-default') Месяц
+            .clearfix
+            hr
+            if(posts)
+                for p in posts
+                    .panel.panel-primary
+                        .panel-heading [#{p.event_date_human}] #{p.source}
+                        .panel-body
+                            !{p.text}
+                        .panel-footer
+                            a(target="_blank", href="#{p.link}") Подробнее &rarr;
+    else
+        .container
+            .jumbotron
+                h1 Events Radar
+                p Система поиска событий в вашей новостной ленте ВКонтакте
+                small
+                    p
+                        Иногда хочется куда-то сходить, но не знаешь куда.
+                        Можно поискать информацию на порталах типа Афиши, KudaGo и т.д., но иногда там только круные мероприятия.
+                        Можно обратиться к пабликам, но опять же там слишком много информации и постов не интересных Вам.
+                        Наконец можно обратиться к друзям и почитать их стены, но как отфильтровать всю не нужную информацию ?
+                    p
+                        Events Radar как раз для этого и предназначен: поиск событий по друзям и группам, с фильтрацией по дате и сету проведения.
+                        Теперь Вам понадобится всего несколько минут, чтобы найти нтересное мероприятие на вечер.
+                p
+                    a.btn.btn-primary.btn-lg(href="#") Найти планы на вечер

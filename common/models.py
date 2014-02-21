@@ -5,6 +5,17 @@ import datetime
 
 # Create your models here.
 
+class Source(models.Model):
+    name = models.CharField(max_length=30, verbose_name=u'Название источника')
+    uid = models.IntegerField(default=0, verbose_name=u'UID источника')
+    users = models.ManyToManyField(User, verbose_name=u'Владельцы')
+
+    def __unicode__(self):
+        return self.name
+
+    class Meta:
+        verbose_name = u'Источник'
+        verbose_name_plural = u'Источники'
 
 class Feedback(models.Model):
     """
