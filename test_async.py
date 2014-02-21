@@ -86,13 +86,15 @@ def cb(resp):
                     if owner_id < 0:
                         owner_id = abs(owner_id)
                         is_public = 1
-                    query = u'insert ignore into common_event (owner_id, post_date, event_date,text,source,link) values ({}, {}, {}, {}, {});'\
+                    query = u"insert ignore into common_event (owner_id, post_date, event_date,text,source,link, is_public) values ({}, '{}', '{}', '{}', {}, {});"\
                         .format(owner_id,
                         post_date.strftime("%Y-%m-%d %H:%M:%S"),
                         event_date,
-                        '',#text,
+                        text,
                         owner_id,
-                        link)
+                        link,
+                        is_public
+                    )
 #                    r = redis.StrictRedis(host='localhost', port=6379, db=0)
 #                    r.set('posts:{}'.format(post['to_id']), query)
 #                    r.save()
