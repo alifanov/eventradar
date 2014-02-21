@@ -84,7 +84,7 @@ def cb(resp):
                     if owner_id < 0:
                         owner_id = abs(owner_id)
                         is_public = 1
-                    query = u'insert ignore into common_event (owner_id, post_date, event_date,text,source,link, is_public) values ({}, {}, {}, {}, {}, {})'\
+                    query = u'insert ignore into common_event (owner_id, post_date, event_date,text,source,link, is_public) values ({}, {}, {}, {}, {}, {});'\
                         .format(owner_id,
                         post_date.isoformat(),
                         event_date,
@@ -95,15 +95,6 @@ def cb(resp):
                     )
 #                    print query.encode('utf-8')
                     cursor.execute(query.encode('utf-8'))
-#                    event = Event.objects.create(
-#                        text = text,
-#                        source = Source.objects.get(uid=post['to_id']),
-#                        link = link,
-#                        post_date = post_date,
-#                        event_date = event_date
-#                    )
-#                    event.users.add(u.user)
-#                    event.save()
 
     except KeyError:
         pass
