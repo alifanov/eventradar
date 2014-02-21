@@ -19,7 +19,6 @@ def get_date_from_string(date_str):
         date = datetime.date.today() + datetime.timedelta(days=1)
     if u' ' in date_str:
         day,month = date_str.split(u' ')
-        print day,month
         now = datetime.datetime.now()
         if day.isdigit():
             day = int(day)
@@ -96,11 +95,11 @@ def cb(resp):
                         link,
                         is_public
                     )
-                    r = redis.StrictRedis(host='localhost', port=6379, db=0)
-                    r.set('posts:{}'.format(post['to_id']), query)
-                    r.save()
-#                    print query.encode('utf-8')
-#                    cursor.execute(query.encode('utf-8'))
+#                    r = redis.StrictRedis(host='localhost', port=6379, db=0)
+#                    r.set('posts:{}'.format(post['to_id']), query)
+#                    r.save()
+                    print query.encode('utf-8')
+                    cursor.execute(query.encode('utf-8'))
 
     except KeyError:
         pass
