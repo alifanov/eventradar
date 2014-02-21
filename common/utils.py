@@ -87,7 +87,7 @@ def get_all_uids():
             rsp = grequests.map(r)
 
             for p in rsp:
-                process_wall(rsp)
+                process_wall(p)
 
     print 'End in {}'.format(time.time()-start)
 
