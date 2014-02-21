@@ -13,9 +13,9 @@ data = cursor.fetchall()
 
 urls = []
 for u in data:
-    print u
+    print u[0]
     urls.append(
-        'https://api.vk.com/method/wall.get?owner_id={}&count=10'.format(u)
+        'https://api.vk.com/method/wall.get?owner_id={}&count=10'.format(u[0])
     )
 print len(urls)
 db.close()
