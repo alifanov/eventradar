@@ -33,7 +33,8 @@ class TodayEventsView(ListView):
     active = 'today'
 
     def get_queryset(self):
-        return self.request.user.events.filter(event_date=datetime.date.today()).order_by('event_date')
+        sources_ids = self.request.user.sources.values_list('uid', flat=True)
+        return Event.objects.filter(owner_id__in=sources_ids, event_date=datetime.date.today()).order_by('event_date')
 
     def get_context_data(self, **kwargs):
         ctx = super(TodayEventsView, self).get_context_data(**kwargs)

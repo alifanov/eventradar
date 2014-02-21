@@ -8,7 +8,7 @@ import datetime
 class Source(models.Model):
     name = models.CharField(max_length=500, verbose_name=u'Название источника')
     uid = models.IntegerField(default=0, verbose_name=u'UID источника')
-    users = models.ManyToManyField(User, verbose_name=u'Владельцы')
+    users = models.ManyToManyField(User, verbose_name=u'Владельцы', related_name='sources')
 
     def __unicode__(self):
         return self.name
