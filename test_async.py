@@ -29,6 +29,7 @@ def cb(resp):
 #        print resp.raw_body
 
 for url in urls[:10]:
+    print 'run'
     unirest.get(url, callback=cb)
 
 print 'End'
