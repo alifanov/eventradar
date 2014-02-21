@@ -36,7 +36,8 @@ class Event(models.Model):
     """
     Модель события
     """
-    users = models.ManyToManyField(User, verbose_name=u'Пользователи', related_name='events')
+#    users = models.ManyToManyField(User, verbose_name=u'Пользователи', related_name='events')
+    owner_id = models.IntegerField(verbose_name=u'UID владельца записи')
     post_date = models.DateTimeField(verbose_name=u'Время публикации записи')
     event_date = models.DateField(verbose_name=u'Дата события')
     text = models.TextField(verbose_name=u'Описание события')
