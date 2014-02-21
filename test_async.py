@@ -59,7 +59,7 @@ for u in data:
         'https://api.vk.com/method/wall.get?owner_id={}&count=10'.format(u[0])
     )
 print len(urls)
-db.close()
+#db.close()
 
 def cb(resp):
     try:
