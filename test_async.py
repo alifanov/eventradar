@@ -103,6 +103,7 @@ def cb(resp):
 #                    r.set('posts:{}'.format(post['to_id']), query)
 #                    r.save()
                     cursor.execute(query.encode('utf-8'))
+                    db.close()
 
     except KeyError:
         pass
