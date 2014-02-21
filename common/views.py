@@ -82,9 +82,8 @@ class FeedbackView(TemplateView):
         ctx['saved'] = self.saved
         return ctx
 
-class HomeView(ListView):
+class HomeView(TemplateView):
     template_name = 'home.html'
-    context_object_name = 'posts'
 
     def dispatch(self, request, *args, **kwargs):
         if request.user.is_authenticated():
