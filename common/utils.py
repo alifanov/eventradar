@@ -81,9 +81,9 @@ def get_all_uids():
         rsp = map(lambda x: x.json(), rsp)
         rsp = map(lambda x: x.get('response', []), rsp)
         rsp = [y for x in rsp for y in x]
-        rsp_ids = [r['uid'] for r in rsp]
-        rsp_ids = list(set(rsp_ids))
         rsp_mod = {r['uid']: r for r in rsp}
+        rsp_ids = rsp_mod.keys()
+        rsp_ids = list(set(rsp_ids))
 
         print 'Count: {}'.format(len(rsp))
         recs = []
