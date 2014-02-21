@@ -91,12 +91,7 @@ def get_all_uids():
 
     print 'End in {}'.format(time.time()-start)
 
-def process_wall(resp):
-    posts = []
-    try:
-        posts = resp.body.response
-    except KeyError:
-        pass
+def process_wall(posts):
     for post in posts:
         if post['text'] and (regexp.match(post['text']) or pattern_day.match(post['text'])):
             date_str = None
