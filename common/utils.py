@@ -46,6 +46,7 @@ def get_date_from_string(date_str):
 
 
 def get_all_uids():
+    start = time.time()
     for u in UserSocialAuth.objects.filter(provider='vk-oauth'):
         # groups
         resp = requests.get('https://api.vk.com/method/groups.get?uid={}&extended=1&access_token={}'
@@ -80,7 +81,6 @@ def get_all_uids():
         rsp = map(lambda x: x.json(), rsp)
         rsp = map(lambda x: x.get('response', []), rsp)
         rsp = [y for x in rsp for y in x]
-        rsp = list(set(rsp))
         rsp = [dict(tupleized) for tupleized in set(tuple(item.items()) for item in rsp)]
 
         print 'Count: {}'.format(len(rsp))
@@ -91,6 +91,7 @@ def get_all_uids():
             )
             s.users.add(u.user)
         print 'Getting others [DONE]'
+    print 'End in {}'.format(time.time()-start)
 
 #    def process_wall(resp):
 #        posts = []
