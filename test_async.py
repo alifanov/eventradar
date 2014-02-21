@@ -82,7 +82,7 @@ def cb(resp):
                     cursor.execute('insert ignore into common_event (owner_id, post_date, event_date,text,source,link) values ({}, {}, {}, {}, {}, {})'
                     .format(post['to_id'],
                         post_date.isoformat(),
-                        event_date.isoformat(),
+                        event_date,
                         text,
                         post['to_id'],
                         link
