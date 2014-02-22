@@ -18,10 +18,11 @@
     <script type="text/javascript">
         var proc = function()
         {
+            console.log('new proc');
             var proc = parseInt($("#proc").text());
             if(proc < 99)
             {
-                $("#proc").text(proc+1)
+                $("#proc").text(proc+1);
             }
             else
             {
