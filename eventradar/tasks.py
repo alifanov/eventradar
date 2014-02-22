@@ -1,8 +1,7 @@
 from celery import app
 #from celery.task import task, periodic_task
-from celery.app.schedules import crontab
+from celery import crontab, periodic_task
 from common.utils import del_old_evens, process_for_user, get_all_uids
-from django.contrib.auth.models import User
 
 @app.periodic_task(ignore_result=True, run_every=crontab(hour=0, minute=0))
 def clean_old_events():
