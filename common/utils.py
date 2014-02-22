@@ -79,7 +79,7 @@ def process_for_user(user):
     dict_ss = {s.uid:s for s in ss}
     ids = ss.values_list('uid', flat=True)
     urls = map(lambda x: posts_url.format(x), ids)
-    n = 100
+    n = 300
     grouped_urls = [urls[i:i+n] for i in xrange(0, len(urls), n)]
     for i, grp in enumerate(grouped_urls):
         print 'Running {}'.format(i)
