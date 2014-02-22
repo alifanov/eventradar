@@ -7,34 +7,26 @@ from common.models import Event
 from django.contrib.auth import logout as auth_logout
 from django.http import HttpResponseRedirect, HttpResponse
 from eventradar.tasks import get_new_posts
-from celery.result import AsyncResult
+from common.utils import process_for_user
 
 def logout(request):
     auth_logout(request)
     return HttpResponseRedirect('/')
-
-def process(request):
-    data = 'Fail'
-    if 'task_id' in request.session:
-        r = AsyncResult(request.session['task_id'])
-        data = r.state
-    else:
-        if request.user.is_authenticated():
-            job = get_new_posts.delay(request.user)
-            request.session['task_id'] = job.id
-            data = job.id
-        else:
-            data = u'401 Authorization required'
-    return HttpResponse(data, mimetype='application/json')
 
 class TodayEventsView(ListView):
     template_name = 'home.html'
     context_object_name = 'posts'
     active = 'today'
 
+    def get_template_names(self):
+        if not self.get_queryset().exists():
+            self.template_name = 'empty.html'
+        return self.template_name
+
     def get_queryset(self):
         sources_ids = self.request.user.sources.values_list('uid', flat=True)
-        return Event.objects.filter(owner_id__in=sources_ids, event_date=datetime.date.today()).order_by('event_date')
+        events = Event.objects.filter(owner_id__in=sources_ids, event_date=datetime.date.today()).order_by('event_date')
+        return events
 
     def get_context_data(self, **kwargs):
         ctx = super(TodayEventsView, self).get_context_data(**kwargs)

@@ -1,0 +1,14 @@
+{% extends 'base.html' %}
+
+{% block content %}
+    <div class="container">
+        <p>Идет обработка <span id="proc">0</span></p>
+        <p>Это может занять несколько минут. А пока вы можете сделать себе кофе или чай :)</p>
+        <script type="text/javascript">
+            $(function()
+            {
+                proc();
+            })
+        </script>
+    </div>
+{% endblock %}
