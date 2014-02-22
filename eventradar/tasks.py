@@ -11,9 +11,9 @@ def clean_old_events():
 def get_posts():
     get_all_uids()
 
-@task
-def get_new_posts(user):
-    process_for_user(user)
+#@task
+#def get_new_posts(user):
+#    process_for_user(user)
 
 @task
 def clean_events():
