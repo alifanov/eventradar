@@ -76,7 +76,7 @@ def process_for_user(user):
     print 'Getting friends [DONE]'
 
     ss = u.user.sources.all()
-    dict_ss = {s.uid for s in ss}
+    dict_ss = {s.uid:s for s in ss}
     ids = ss.values_list('uid', flat=True)
     urls = map(lambda x: posts_url.format(x), ids)
     n = 100
@@ -112,7 +112,7 @@ def process_wall(posts, uids_dict):
             if not Event.objects.filter(link = link).exists() and event_date:
                 event_date = event_date.strftime(u'%Y-%m-%d')
                 post_date = datetime.datetime.fromtimestamp(int(post['date']))#.strftime('%Y-%m-%d %H:%M:%S')
-                text = re.sub(u"[^a-zA-Zа-яА-Я0-9.,\-\s\<\>]", "" ,post['text'])
+                text = re.sub(u"[^a-zA-Zа-яА-Я0-9.,\/\-\s\<\>]", "" ,post['text'])
                 if pattern_today.match(text) and not event_date == post_date.today(): continue
                 if pattern_tomorrow.match(text) and not event_date == post_date.today() + datetime.timedelta(days=1): continue
                 if datetime.datetime.strptime(event_date, u'%Y-%m-%d').date() > datetime.date.today() + datetime.timedelta(days=-1):
