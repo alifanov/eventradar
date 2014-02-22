@@ -7,7 +7,7 @@ from common.utils import del_old_evens, process_for_user, get_all_uids
 def clean_old_events():
     del_old_evens()
 
-@aperiodic_task(ignore_result=True, run_every=crontab(hour="*/4"))
+@periodic_task(ignore_result=True, run_every=crontab(hour="*/4"))
 def get_posts():
     get_all_uids()
 
