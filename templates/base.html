@@ -18,21 +18,17 @@
     <script type="text/javascript">
         var proc = function()
         {
-            $.ajax({
-                dataType: 'text',
-                type: 'GET',
-                url: '/run/',
-                success: function(resp)
-                {
-                    if (resp == 'SUCCESS'){
-                        location.reload();
-                    }
-                    else
-                    {
-                        setTimeout(proc, 1000);
-                    }
-                }
-            });
+            var proc = parseInt($("#proc").text());
+            if(proc < 99)
+            {
+                $("#proc").text(proc+1)
+            }
+            else
+            {
+                location.href="/";
+            }
+
+            setTimeout(proc, 1000);
         };
     </script>
 </head>
