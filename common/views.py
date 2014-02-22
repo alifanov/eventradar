@@ -23,11 +23,6 @@ class TodayEventsView(ListView):
     context_object_name = 'posts'
     active = 'today'
 
-    def get_template_names(self):
-        if not self.get_queryset().exists():
-            self.template_name = 'empty.html'
-        return self.template_name
-
     def get_queryset(self):
         sources_ids = self.request.user.sources.values_list('uid', flat=True)
         events = Event.objects.filter(owner_id__in=sources_ids, event_date=datetime.date.today()).order_by('event_date')
