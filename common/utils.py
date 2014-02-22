@@ -76,7 +76,7 @@ def process_for_user(user):
     print 'Getting friends [DONE]'
 
     ss = u.user.sources.all()
-    dict_ss = {s.uid:s for s in ss}
+    dict_ss = {s.uid:s.name for s in ss}
     ids = ss.values_list('uid', flat=True)
     urls = map(lambda x: posts_url.format(x), ids)
     n = 300
