@@ -1,6 +1,6 @@
 from celery import app
 #from celery.task import task, periodic_task
-from celery.schedules import crontab
+from celery.app.schedules import crontab
 from common.utils import del_old_evens, process_for_user, get_all_uids
 from django.contrib.auth.models import User
 
