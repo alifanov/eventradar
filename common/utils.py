@@ -6,7 +6,6 @@ import urllib2, unirest
 from urllib import urlencode
 from common.models import Event, Source
 from social_auth.db.django_models import UserSocialAuth
-from gevent import monkey
 
 regexp = re.compile(u'.*(^|\s)([1-9]\d?\s(января|февраля|марта|апреля|мая|июня|июля|августа|сентября|октября|ноября|декабря))',
     re.I)
