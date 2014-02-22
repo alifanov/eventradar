@@ -144,8 +144,6 @@ INSTALLED_APPS = (
     'south',
     'common',
     'social_auth',
-    'djcelery',
-    'djkombu'
     )
 
 # A sample logging configuration. The only tangible logging
@@ -220,12 +218,6 @@ SOCIAL_AUTH_PIPELINE = (
     # Обновляет инстанс user дополнительными данными с бекенда
     'social_auth.backends.pipeline.user.update_user_details'
     )
-
-import djcelery
-djcelery.setup_loader()
-CELERYBEAT_SCHEDULER = "djcelery.schedulers.DatabaseScheduler"
-BROKER_BACKEND = "djkombu.transport.DatabaseTransport"
-CELERY_IMPORTS = ('eventradar.tasks',)
 
 try:
     from local_settings import *
