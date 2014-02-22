@@ -13,6 +13,11 @@ def logout(request):
     auth_logout(request)
     return HttpResponseRedirect('/')
 
+def process(request):
+    if request.user.is_authenticated():
+        process_for_user(request.user)
+    return HttpResponse('ok')
+
 class TodayEventsView(ListView):
     template_name = 'home.html'
     context_object_name = 'posts'

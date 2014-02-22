@@ -21,6 +21,10 @@
             var procent = parseInt($("#proc").text());
             if(procent < 99)
             {
+                if(procent == 1)
+                {
+                    $.get('/run/');
+                }
                 $("#proc").text(procent+1);
             }
             else
